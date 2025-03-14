@@ -9,10 +9,10 @@ export default function Footer() {
       <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 z-10">
         {/* Newsletter Section */}
         <div className="space-y-4">
-       <div className=" text-32 text-blue-50 mb-20">
-       Research has had a very large influence <br /> on my life. 
-       I have learned <br /> most of what I know through research.
-       </div>
+          <div className=" text-32 text-blue-50 mb-20">
+            Research has had a very large influence <br /> on my life. I have
+            learned <br /> most of what I know through research.
+          </div>
           <h3 className="text-xl font-bold text-white mb-4">Newsletter</h3>
           <div className="relative">
             <input
@@ -26,7 +26,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/*les adresse  Address */}
+        {/* Address Section */}
         <div className="space-y-3 ">
           <h4 className="text-lg font-semibold text-white">Address</h4>
           <p className="text-sm mt-4">
@@ -40,8 +40,7 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* 
-        lien rapide */}
+        {/* Quick Links Section */}
         <div className="space-y-3">
           <h4 className="text-lg font-semibold text-white">Quick Links</h4>
           <ul className="space-y-2">
@@ -58,7 +57,7 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Brands & Social Media */}
+        {/* Brands & Social Media Section */}
         <div className="space-y-6">
           <div className="space-y-3">
             <h4 className="text-lg font-semibold text-white">Our Brands</h4>
@@ -76,56 +75,43 @@ export default function Footer() {
                 href="#"
                 className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
               >
-                <svg
-                  className="w-4 h-4 fill-current text-white"
-                  aria-hidden="true"
-                >
-                  {/* les icons ici */}
-                </svg>
-                <span className="sr-only"></span>
+                <img
+                  src="../public/facebookicon.png"
+                  alt="Facebook icon"
+                  className="w-7 h-7 fill-current text-white"
+                />
+                <span className="sr-only">Facebook</span>
               </a>
+
               <a
                 href="#"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
+                className="w-8 h-8  rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
               >
-                <svg
-                  className="w-4 h-4 fill-current text-white"
-                  aria-hidden="true"
-                >
-                  {/* Ajoutez les SVG appropriés ici */}
-                </svg>
-                <span className="sr-only"></span>
+                <img
+                  src="../public/tiktok.png"
+                  alt="Tik Tok icon"
+                  className="w-7 h-7 fill-current text-white"
+                />
+                <span className="sr-only">Tik Tok</span>
               </a>
+
               <a
                 href="#"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
+                className="w-7 h-7  rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
               >
-                <svg
-                  className="w-4 h-4 fill-current text-white"
-                  aria-hidden="true"
-                >
-                  {/* Ajoutez les SVG appropriés ici */}
-                </svg>
-                <span className="sr-only"></span>
+                <img
+                  src="../public/instagra.png"
+                  alt="Instagram icon"
+                  className="w-6 h-6 fill-current text-white"
+                />
+                <span className="sr-only">Instagram</span>
               </a>
-              <a
-                href="#"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
-              >
-                <svg
-                  className="w-4 h-4 fill-current text-white"
-                  aria-hidden="true"
-                >
-                  {/* Ajoutez les SVG appropriés ici */}
-                </svg>
-                <span className="sr-only"></span>
-              </a>
+
+              
             </div>
           </div>
         </div>
       </div>
-
-     
     </footer>
   );
 }
