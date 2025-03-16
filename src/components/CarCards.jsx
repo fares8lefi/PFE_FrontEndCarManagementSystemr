@@ -1,0 +1,87 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getAllCars } from "../services/ApiCar";
+
+export default function CarCards() {
+  const [cars, setCars] = useState([]);
+  const navigate = useNavigate();
+
+  const getCars = async () => {
+    try {
+      const res = await getAllCars(); // Appel API correct
+      if (res.data && Array.isArray(res.data.cars)) {
+        setCars(res.data.cars);
+      } else {
+        console.error("Données voitures invalides :", res.data);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des voitures :", error);
+    }
+  };
+
+  useEffect(() => {
+    getCars();
+  }, []);
+
+  const handleCarClick = (id) => {
+    if (id) navigate(`/carDetaille/${id}`);
+  };
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mx-24 mt-6">
+      {cars.length === 0 ? (
+        <p className="col-span-full text-center">Aucune voiture trouvée.</p>
+      ) : (
+        cars.map((car) => (
+          <div
+            key={car._id}
+            className="rounded-xl overflow-hidden shadow-lg border p-4 bg-white cursor-pointer"
+            onClick={() => handleCarClick(car._id)}
+          >
+            <div className="bg-gray-300 h-40 w-full flex items-center justify-center">
+              {car?.cars_images ? (
+                <img
+                  src={car.cars_images} // Pas besoin de `.map()` ni `[0]`
+                  alt={`Image de ${car.marque || "Voiture"} ${car.model || ""}`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-gray-500">Image Placeholder</span>
+              )}
+            </div>
+            <div className="py-4">
+              <p className="text-sm text-gray-500">
+                {car.model || "Modèle inconnu"}
+              </p>
+              <h2 className="text-xl font-bold">
+                {car.marque || "Marque inconnue"}
+              </h2>
+              <div className="grid grid-cols-2 gap-2 mt-2 text-sm text-gray-700">
+                <p className="flex items-center gap-1">
+                  <span>🛢️</span> {car.fuelType || "Non spécifié"}
+                </p>
+                <p className="flex items-center gap-1">
+                  <span>⚙️</span> {car.statut || "Disponible"}
+                </p>
+                <p className="flex items-center gap-1">
+                  <span>📅</span> {car.year || "Année inconnue"}
+                </p>
+                <p className="flex items-center gap-1">
+                  <span>🎮</span> {car.transmission || "Manuelle"}
+                </p>
+              </div>
+              <div className="flex justify-between items-center mt-4">
+                <p className="text-red-600 font-bold text-lg">
+                  ${car.price?.toLocaleString() || "Prix inconnu"}
+                </p>
+                <p className="text-gray-600 flex items-center gap-1">
+                  <span>⭐</span> {car.reviews || "0"} Avis
+                </p>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
