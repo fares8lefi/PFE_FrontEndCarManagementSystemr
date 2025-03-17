@@ -7,56 +7,73 @@ export default function CarDetaille() {
   const [car, setCar] = useState(null);
 
   useEffect(() => {
-    const fetchCarDetails = async () => {
+    const CarDetails = async () => {
       try {
         const response = await getCarById(id);
-        if (response.data) {
-          setCar(response.data);
-        } else {
-          console.error("Aucune voiture trouvée avec cet ID.");
-        }
+        setCar(response.data || null);
       } catch (error) {
-        console.error("Erreur lors de la récupération des détails de la voiture :", error);
+        console.error("Erreur lors de la récupération des détails :", error);
       }
     };
-
-    if (id) fetchCarDetails();
+    if (id) CarDetails();
   }, [id]);
 
-  if (!car) {
-    return <p className="text-center text-gray-500">Chargement des détails...</p>;
-  }
-
   return (
-    <div className="max-w-3xl mx-auto p-4 bg-white shadow-lg rounded-lg">
-      <div className="mb-4">
-        {car?.cars_images?.length > 0 ? (
-          <img
-            src={car.cars_images[0]}
-            alt={`Image de ${car.marque || "Voiture"} ${car.model || ""}`}
-            className="w-full h-64 object-cover rounded-lg"
-          />
-        ) : (
-          <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
-            <span className="text-gray-500">Image Placeholder</span>
+    <div className="w-full min-h-screen bg-gray-50 p-8">
+      {/* Conteneur principal en full width */}
+      <div className="w-full bg-white shadow-xl rounded-2xl p-8">
+        {/* Galerie d'images scrollable */}
+        <div className="mb-8 overflow-x-auto pb-4 whitespace-nowrap scrollbar-hide">
+          <div className="flex space-x-4 w-max px-4">
+            {car?.cars_images?.map((img, index) => (
+              <div 
+                key={index}
+                className="relative flex-shrink-0 w-96 h-64 rounded-xl overflow-hidden shadow-lg"
+              >
+                <img
+                  src={img}
+                  alt={`${car.marque} ${car.model} - ${index + 1}`}
+                  className="w-full h-full object-cover transform hover:scale-110 transition duration-300"
+                />
+              </div>
+            ))}
           </div>
-        )}
-      </div>
-      <h2 className="text-2xl font-bold">{car.marque || "Marque inconnue"}</h2>
-      <p className="text-gray-600">{car.model || "Modèle inconnu"}</p>
-      <div className="grid grid-cols-2 gap-4 mt-4 text-gray-700">
-        <p><strong>🛢️ Carburant:</strong> {car.fuelType || "Non spécifié"}</p>
-        <p><strong>⚙️ Statut:</strong> {car.statut || "Disponible"}</p>
-        <p><strong>📅 Année:</strong> {car.year || "Non spécifié"}</p>
-        <p><strong>🎮 Transmission:</strong> {car.transmission || "Manuelle"}</p>
-      </div>
-      <div className="flex justify-between items-center mt-6">
-        <p className="text-red-600 font-bold text-2xl">
-          ${car.price?.toLocaleString() || "Prix inconnu"}
-        </p>
-        <p className="text-gray-600 flex items-center gap-1">
-          <span>⭐</span> {car.reviews || "0"} Avis
-        </p>
+          {car?.cars_images?.length === 0 && (
+            <div className="w-full h-96 bg-gray-100 flex items-center justify-center rounded-xl">
+              <span className="text-gray-400 text-xl">Aucune image disponible</span>
+            </div>
+          )}
+        </div>
+
+        {/* Détails de la voiture */}
+        <div className="px-8 pb-8 space-y-6">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+            <h1 className="text-4xl font-bold text-gray-900">
+              {car?.marque} {car?.model}
+            </h1>
+            <p className="text-3xl font-bold text-blue-600">
+              {car?.price?.toLocaleString('fr-FR') 
+                ? `${car.price.toLocaleString('fr-FR')} DT`
+                : "Prix négociable"}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-4 text-xl text-gray-600">
+            {car?.year && <span className="bg-gray-100 px-4 py-2 rounded-full">🏷️ {car.year}</span>}
+            {car?.fuelType && <span className="bg-gray-100 px-4 py-2 rounded-full">⛽ {car.fuelType}</span>}
+            {car?.transmission && <span className="bg-gray-100 px-4 py-2 rounded-full">⚙️ {car.transmission}</span>}
+            {car?.statut && <span className="bg-green-100 px-4 py-2 rounded-full text-green-800">✔️ {car.statut}</span>}
+          </div>
+
+          {car?.description && (
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <h3 className="text-2xl font-semibold mb-4">Description</h3>
+              <p className="text-gray-700 text-lg leading-relaxed">
+                {car.description}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
