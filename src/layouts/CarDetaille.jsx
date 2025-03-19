@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getCarById } from "../services/ApiCar";
 import CarPlusDetaille from "../components/CarPlusDetaille";
+import CommentCards from "../components/CommentCards";
+
+
 export default function CarDetaille() {
   const { id } = useParams();
   const [car, setCar] = useState(null);
@@ -119,6 +122,7 @@ export default function CarDetaille() {
         </div>
       </div>
       <CarPlusDetaille/>
+      <CommentCards carId={id} /> 
     </div>
    
   );
