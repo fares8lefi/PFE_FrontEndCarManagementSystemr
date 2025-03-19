@@ -8,14 +8,11 @@ export default function CarCards() {
 
   const getCars = async () => {
     try {
-      const res = await getAllCars(); // Appel API correct
-      if (res.data && Array.isArray(res.data.cars)) {
-        setCars(res.data.cars);
-      } else {
-        console.error("Données voitures invalides :", res.data);
-      }
+      const res = await getAllCars(); // Appel API car
+     
+        setCars(res.data.cars); 
     } catch (error) {
-      console.error("Erreur lors de la récupération des voitures :", error);
+      console.error(error);
     }
   };
 
@@ -41,7 +38,7 @@ export default function CarCards() {
             <div className="bg-gray-300 h-40 w-full flex items-center justify-center">
               {car?.cars_images ? (
                 <img
-                  src={car.cars_images} // Pas besoin de `.map()` ni `[0]`
+                  src={car.cars_images} 
                   alt={`Image de ${car.marque || "Voiture"} ${car.model || ""}`}
                   className="h-full w-full object-cover"
                 />
@@ -51,31 +48,47 @@ export default function CarCards() {
             </div>
             <div className="py-4">
               <p className="text-sm text-gray-500">
-                {car.model || "Modèle inconnu"}
+                {car.model}
               </p>
               <h2 className="text-xl font-bold">
-                {car.marque || "Marque inconnue"}
+                {car.marque}
               </h2>
               <div className="grid grid-cols-2 gap-2 mt-2 text-sm text-gray-700">
                 <p className="flex items-center gap-1">
-                  <span>🛢️</span> {car.fuelType || "Non spécifié"}
+                  <span>🛢️</span> {car.fuelType }
                 </p>
                 <p className="flex items-center gap-1">
-                  <span>⚙️</span> {car.statut || "Disponible"}
+                  <span>
+                  <img
+                  src="../public/statut.png"
+                  alt="Tik Tok icon"
+                  className="w-4 h-4 fill-current text-white"
+                />
+                  </span> {car.statut}
                 </p>
                 <p className="flex items-center gap-1">
-                  <span>📅</span> {car.year || "Année inconnue"}
+                  <span> <img
+                  src="../public/calendrier.png"
+                  alt="Tik Tok icon"
+                  className="w-4 h-4 fill-current text-white"
+                /></span> {car.year }
                 </p>
                 <p className="flex items-center gap-1">
-                  <span>🎮</span> {car.transmission || "Manuelle"}
+                  <span>
+                  <img
+                  src="../public/transmission.png"
+                  alt="Tik Tok icon"
+                  className="w-4 h-4 fill-current text-white"
+                />  
+                  </span> {car.transmission}
                 </p>
               </div>
               <div className="flex justify-between items-center mt-4">
                 <p className="text-red-600 font-bold text-lg">
-                  ${car.price?.toLocaleString() || "Prix inconnu"}
+                  ${car.price}
                 </p>
                 <p className="text-gray-600 flex items-center gap-1">
-                  <span>⭐</span> {car.reviews || "0"} Avis
+                  <span>⭐</span> {car.reviews } {/*la fonction d'ajoue aux favoris ici*/}
                 </p>
               </div>
             </div>

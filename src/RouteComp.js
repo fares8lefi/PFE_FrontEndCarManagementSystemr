@@ -6,8 +6,9 @@ import UsersTable from './components/UsersTable.jsx'
 import CarCards from './components/CarCards.jsx'
 import Login from './layouts/Login.jsx'
 import Singup from './layouts/Singup.jsx'
-import Error  from './layouts/Error.jsx'
+// import Error  from './layouts/Error.jsx'
 import CarDetaille  from './layouts/CarDetaille.jsx'
+import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
 export default function RouteComp() {
   return (
     <div>
@@ -19,6 +20,7 @@ export default function RouteComp() {
         <Route path='/usersTable' element={<UsersTable/>}></Route>
         <Route path='/carCards' element={<CarCards/>}></Route>
         <Route path='/carDetaille/:id' element={<CarDetaille/>}></Route>
+        <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
       </Routes>
 

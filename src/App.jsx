@@ -7,9 +7,12 @@ import Error  from './layouts/Error.jsx'
 import UsersTable from './components/UsersTable.jsx'
 import CarCards from './components/CarCards.jsx'
 import CarDetaille from './layouts/CarDetaille.jsx'
+import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
+
 function App() {
   return (
     <>
+  
      
       <Routes>
         <Route path="/Navbar" element={<Navbar />} />
@@ -19,6 +22,7 @@ function App() {
         <Route path="/UsersTable" element={<UsersTable />} />
         <Route path="/carCards" element={<CarCards />} />
         <Route path='/carDetaille/:id' element={<CarDetaille/>}></Route>
+        <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
       </Routes>
     </>

@@ -49,7 +49,7 @@ export default function CarDetaille() {
             />
           </div>
 
-          {/* --- Liste de vignettes (thumbnails) --- */}
+          
           <div className="flex space-x-4 mt-4 overflow-x-auto pb-4 whitespace-nowrap scrollbar-hide">
             {car.cars_images.map((img, index) => (
               <img
