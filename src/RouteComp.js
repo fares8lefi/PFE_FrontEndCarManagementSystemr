@@ -9,6 +9,7 @@ import Singup from './layouts/Singup.jsx'
 // import Error  from './layouts/Error.jsx'
 import CarDetaille  from './layouts/CarDetaille.jsx'
 import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
+import CommentCards  from './components/CommentCards.jsx'
 export default function RouteComp() {
   return (
     <div>
@@ -21,6 +22,7 @@ export default function RouteComp() {
         <Route path='/carCards' element={<CarCards/>}></Route>
         <Route path='/carDetaille/:id' element={<CarDetaille/>}></Route>
         <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
+        <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
       </Routes>
 
