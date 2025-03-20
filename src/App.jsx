@@ -9,6 +9,7 @@ import CarCards from './components/CarCards.jsx'
 import CarDetaille from './layouts/CarDetaille.jsx'
 import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
 import CommentCards from './components/CommentCards.jsx'
+import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path='/carDetaille/:id' element={<CarDetaille/>}></Route>
         <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
+        <Route path='/addCarAnnounecement' element={<AddCarAnnounecement/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
       </Routes>
     </>
