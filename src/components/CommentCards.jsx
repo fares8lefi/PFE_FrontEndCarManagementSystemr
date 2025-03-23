@@ -29,6 +29,14 @@ export default function CommentCards({ carId }) { // recupérez carId depuis les
 
   return (
     <div className="space-y-4 mt-6 p-8">
+    <span>
+    <input
+            type="text"
+            placeholder="Enter Your comment"
+            className="w-7xl min-w-2xl bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
+          />
+     <button className="w-24 h-12 bg-amber-400 mx-6 rounded-3xl text-white">Add</button>
+    </span>
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Commentaires ({comments.length})</h2>
       {comments.map((comment) => (
         <div 
