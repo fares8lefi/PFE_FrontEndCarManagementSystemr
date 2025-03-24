@@ -1,8 +1,44 @@
-import React from 'react';
+import  {React, useState }from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import {loginUser} from '../services/ApiUser'
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [loginData,setloginData]=useState({
+    email:"",
+    password:""
+  });
+  
+  const handleChange =(e)=>{
+    const {name ,value} =e.target;
+    setloginData({...loginData,[name]:value})
+  }
+  const login = async () => {
+    
+    try {
+      const response = await loginUser(loginData);
+      console.log(response.data.token)
+     
+      if (response.data?.success) {
+        localStorage.setItem('authToken', response.data.token);
+        const userRole = response.data.user.role; 
+        console.log(userRole)
+      if (userRole === 'admin') {
+        navigate('/usersTable');  
+      } else {
+        navigate('/carCards');  
+      }
+      } else {
+        alert(response.data?.message || "authentification echouée");
+      }
+  
+    } catch (error) {
+      console.error( error);
+      alert(error.response?.data?.message || "erreur du connexion");
+    }
+  };
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -25,11 +61,15 @@ export default function Login() {
           <input
             type="email"
             placeholder="Enter Your E-Mail"
+            name="email"
+            onChange={handleChange}
             className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
           />
           <input
             type="password"
             placeholder="Password"
+            name="password"
+            onChange={handleChange}
             className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
           />
           
@@ -41,7 +81,8 @@ export default function Login() {
             <a href="#" className="text-amber-700">Forgot Password ?</a>
           </div>
           
-          <button className="bg-black w-full rounded-3xl py-3 text-white text-center font-semibold">LogIn</button>
+          <button className="bg-black w-full rounded-3xl py-3 text-white text-center font-semibold"
+          onClick={login}>LogIn</button>
           
           <div className="flex items-center my-4">
             <div className="flex-1 border-t border-gray-300"></div>
@@ -63,3 +104,4 @@ export default function Login() {
     </div>
   );
 }
+;
