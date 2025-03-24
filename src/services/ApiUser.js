@@ -12,3 +12,16 @@ export async function addUserClientImgOf(formData) {
         formData
     );
 }
+
+export async function loginUser(formData) {
+  return await axios.post(
+    `${apiurl}/loginUser`,
+    formData,
+    {
+      withCredentials: true, // Activer les cookies
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+}
