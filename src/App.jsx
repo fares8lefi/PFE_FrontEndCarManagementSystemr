@@ -3,7 +3,7 @@ import Navbar from './components/Navbar';
 import Footer  from './components/Footer';
 import Login from './layouts/Login'
 import Singup from './layouts/Singup.jsx'
-import Error  from './layouts/Error.jsx'
+import Home  from './layouts/home.jsx'
 import UsersTable from './components/UsersTable.jsx'
 import CarCards from './components/CarCards.jsx'
 import CarDetaille from './layouts/CarDetaille.jsx'
@@ -27,6 +27,7 @@ function App() {
         <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
         <Route path='/addCarAnnounecement' element={<AddCarAnnounecement/>}></Route>
+        <Route path='/*' element={<Home/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
       </Routes>
     </>
