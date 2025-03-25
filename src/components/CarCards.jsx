@@ -21,7 +21,20 @@ export default function CarCards() {
   }, []);
 
   const handleCarClick = (id) => {
-    if (id) navigate(`/carDetaille/${id}`);
+    const logged = localStorage.getItem('authToken');
+  
+    if (!id) return;
+  
+    if (logged) {
+      navigate(`/carDetaille/${id}`);
+    } else { 
+      navigate('/login', { 
+        state: { 
+          from: `/carDetaille/${id}`, 
+          message: "Veuillez vous connecter pour accéder aux détails du véhicule" 
+        } 
+      });
+    }
   };
 
   return (
