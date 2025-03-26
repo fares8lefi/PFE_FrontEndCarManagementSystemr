@@ -1,6 +1,26 @@
-import React from "react";
+import {React,useState  }from "react";
+import {addNewsLetter } from "../services/ApiNewsLetter";
+
 
 export default function Footer() {
+   const [newsLetter, setNewsLetter] = useState({
+    email:""
+   });
+  
+
+   const handleChange =(e)=>{
+    const {name ,value} =e.target;
+    setNewsLetter({...newsLetter,[name]:value})
+  }
+  const submitnewsLetter=async()=>{
+    try{
+       await addNewsLetter(newsLetter);
+      alert("vous éte bien inscrit a news Letter ")
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
   return (
     <footer className="relative bg-gray-900 bg-[url('../public/background.jpg')] bg-cover bg-center text-gray-300 py-12 px-6 md:px-12">
       {/* Overlay semi-transparent */}
@@ -17,10 +37,14 @@ export default function Footer() {
           <div className="relative">
             <input
               type="email"
+              name="email"
+              onChange={handleChange}
               placeholder="Your Email"
               className="w-full p-3 bg-white/10 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 backdrop-blur-sm"
             />
-            <button className="absolute right-2 top-2 bg-blue-500 text-white px-4 py-1 rounded-3xl hover:bg-blue-600 transition-transform duration-200">
+            <button className="absolute right-2 top-2 bg-blue-500 text-white px-4 py-1 rounded-3xl hover:bg-blue-600 transition-transform duration-200"
+            onClick={submitnewsLetter}
+            >
               Subscribe
             </button>
           </div>
