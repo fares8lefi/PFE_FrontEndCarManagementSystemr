@@ -52,6 +52,7 @@ export default function Singup() {
       formData.append("user_image", newUser.user_image);
 
       await addUserClientImgOf(formData);
+      alert("registre successfully");
     } catch (error) {
       console.error(error);
     }

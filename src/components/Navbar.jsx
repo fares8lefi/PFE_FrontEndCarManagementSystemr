@@ -1,8 +1,32 @@
 import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { getUsersbyId } from "../services/ApiUser";
 
 function Navbar() {
+  const [user, setUser] = useState({ user_image: null }); // Initialisé avec null pour l'image
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('authToken');
+
+  const UserData = async () => {
+    try {
+      if (isLoggedIn) { // Seulement si l'utilisateur est connecté
+        const response = await getUsersbyId();
+        // Vérification en profondeur de la réponse
+        if (response?.data?.user?.user_image) {
+          setUser({ user_image: response.data.user.user_image });
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des données utilisateur:",
+        error
+      );
+    }
+  };
+
+  useEffect(() => {
+    UserData();
+  }, [isLoggedIn]); // Dépendance ajoutée pour recharger si le statut de connexion change
 
   const Login = () => {
     navigate('/login');
@@ -30,7 +54,6 @@ function Navbar() {
               className='md:hidden bg-blue-500 hover:bg-blue-600 px-4 py-1 rounded-full 
                        text-xs transition-colors duration-300 flex items-center gap-1'
             >
-              
               <span>Login</span>
             </button>
           )}
@@ -48,32 +71,48 @@ function Navbar() {
         </div>
 
         {/* Barre de recherche/bouton login version desktop */}
-        <div className='w-full md:w-auto flex justify-end'>
+        <div className='w-full md:w-auto flex justify-end items-center gap-4'>
           {isLoggedIn ? (
-            <div className='relative w-full md:max-w-md'>
-              <input
-                type='text'
-                placeholder='Rechercher...'
-                className='w-full pl-3 pr-8 py-1 md:py-2 rounded-full bg-white/10 
-                         text-xs md:text-sm placeholder-gray-300 focus:outline-none focus:ring-1 
-                         focus:ring-blue-400 transition-all duration-300'
-              />
-              <svg
-                className='w-4 h-4 absolute right-2 top-2 text-gray-300'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
-              </svg>
-            </div>
+            <>
+              <div className='relative w-full md:max-w-md'>
+                <input
+                  type='text'
+                  placeholder='Rechercher...'
+                  className='w-full pl-3 pr-8 py-1 md:py-2 rounded-full bg-white/10 
+                           text-xs md:text-sm placeholder-gray-300 focus:outline-none focus:ring-1 
+                           focus:ring-blue-400 transition-all duration-300'
+                />
+                <svg
+                  className='w-4 h-4 absolute right-2 top-2 text-gray-300'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                </svg>
+              </div>
+              {/*navigate to page profil*/}
+              {user.user_image && (
+                <a
+                  href="#"
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
+                >
+                  <img
+                    src={user.user_image}
+                    alt="Profil"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                  <span className="sr-only">Profil</span>
+                </a>
+              )}
+            </>
           ) : (
             <button 
               onClick={Login}
               className='hidden md:flex bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-full 
                        text-sm transition-colors duration-300 items-center gap-1'
             >
-              <span>🔑</span>{/*ajouter icon login */}
+              <span>🔑</span>
               <span>Login</span>
             </button>
           )}

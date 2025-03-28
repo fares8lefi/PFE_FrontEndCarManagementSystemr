@@ -10,6 +10,7 @@ import CarDetaille from './layouts/CarDetaille.jsx'
 import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
 import CommentCards from './components/CommentCards.jsx'
 import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
+import ProfilCard from './components/ProfilCards.jsx'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
         <Route path='/addCarAnnounecement' element={<AddCarAnnounecement/>}></Route>
+        <Route path='/profilCard' element={<ProfilCard/>}></Route>
         <Route path='/*' element={<Home/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
       </Routes>
