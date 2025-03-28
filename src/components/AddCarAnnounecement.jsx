@@ -197,7 +197,7 @@ export default function AddCarAnnounecement() {
           </button>
         </div>
       </form>
-      {/*boite de dialogue est afichage de qr code */}
+      {/*boite de dialogue est affichage de qr code */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div
