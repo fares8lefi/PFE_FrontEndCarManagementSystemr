@@ -11,7 +11,7 @@ import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
 import CommentCards from './components/CommentCards.jsx'
 import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
 import ProfilCard from './components/ProfilCards.jsx'
-
+import Favoris from './components/favoris.jsx'
 function App() {
   return (
     <>
@@ -24,6 +24,7 @@ function App() {
         <Route path="/singup" element={<Singup />} />
         <Route path="/UsersTable" element={<UsersTable />} />
         <Route path="/carCards" element={<CarCards />} />
+        <Route path="/favoris" element={<Favoris />} />
         <Route path='/carDetaille/:id' element={<CarDetaille/>}></Route>
         <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
