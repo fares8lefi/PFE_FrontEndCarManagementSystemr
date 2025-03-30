@@ -16,3 +16,9 @@ export async function addCarToFavorites(carId) {
     );
 }
 
+export async function deleteFavoris(favoriId) {
+    return await axios.delete(`${apiurl}/deleteFavoris`, {
+        data: { carId: favoriId },  // Envoyer les données dans "data" pour une requête DELETE
+        withCredentials: true,
+    });
+}
