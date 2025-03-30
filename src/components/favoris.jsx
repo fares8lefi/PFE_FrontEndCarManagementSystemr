@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { getUserFavorites } from "../services/ApiFavoris";
+import { getUserFavorites, deleteFavoris } from "../services/ApiFavoris";
 import { useNavigate } from "react-router-dom";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function Favoris() {
   const [favorites, setFavorites] = useState([]);
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Fonction pour récupérer les favoris
   const getFavorites = async () => {
     try {
       const response = await getUserFavorites();
-      console.log("Réponse des favoris:", response.data);
       if (response.data?.favorites) {
         setFavorites(response.data.favorites);
       }
     } catch (error) {
-      console.error("Erreur lors de la récupération des favoris:", error);
-    } finally {
-      setLoading(false);
+      console.error(error);
+    } 
+  };
+
+  // Fonction supprimer de favoris 
+  const deleteFavori = async (favoriId) => {
+    try {
+      const response = await deleteFavoris(favoriId);
+      if (response.status === 200) {
+        setFavorites(response.data.favorites);
+      } else {
+        console.error(response.data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
   
@@ -30,9 +42,7 @@ export default function Favoris() {
     navigate(`/carDetaille/${id}`);
   };
 
-  if (loading) {
-    return <div className="text-center mt-6">Chargement en cours</div>;
-  }
+ 
 
   return (
     <div className="p-4 mx-auto max-w-4xl">
@@ -46,7 +56,7 @@ export default function Favoris() {
               className="flex items-center rounded-xl overflow-hidden shadow-lg border p-4 bg-white cursor-pointer hover:shadow-xl transition-shadow"
               onClick={() => handleCarClick(car._id)}
             >
-              {/* Image */}
+              {/* image */}
               <div className="w-1/3 h-32 flex items-center justify-center bg-gray-300">
                 {car?.cars_images && car.cars_images.length > 0 ? (
                   <img
@@ -59,7 +69,7 @@ export default function Favoris() {
                 )}
               </div>
 
-              {/* les Informations*/}
+              {/* information */}
               <div className="w-2/3 pl-4">
                 <h2 className="text-xl font-bold">
                   {car.marque} {car.model}
@@ -80,9 +90,12 @@ export default function Favoris() {
                   <p className="text-red-600 font-bold text-lg">${car.price}</p>
                   <button
                     className="text-red-500"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteFavori(car._id);
+                    }}
                   >
-                    <FavoriteIcon fontSize="small" />
+                    <DeleteIcon fontSize="small" />
                   </button>
                 </div>
               </div>
