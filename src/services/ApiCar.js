@@ -15,3 +15,9 @@ export const addCarImages = (submitCarData) => {
     withCredentials: true, //activations des cokkies
   });
 };
+
+export const getUserCars = () => {
+  return axios.get(`${apiurl}/getUserCars`,  {
+    withCredentials: true, //activations des cokkies
+  });
+};
