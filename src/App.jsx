@@ -12,6 +12,7 @@ import CommentCards from './components/CommentCards.jsx'
 import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
 import ProfilCard from './components/ProfilCards.jsx'
 import Favoris from './components/favoris.jsx'
+import UserCars from './components/UserCars.jsx'
 function App() {
   return (
     <>
@@ -29,6 +30,7 @@ function App() {
         <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
         <Route path='/addCarAnnounecement' element={<AddCarAnnounecement/>}></Route>
+        <Route path='/userCars' element={<UserCars/>}></Route>
         <Route path='/profilCard' element={<ProfilCard/>}></Route>{/*id from session*/}
         <Route path='/*' element={<Home/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
