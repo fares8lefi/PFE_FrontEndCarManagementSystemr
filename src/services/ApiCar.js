@@ -21,3 +21,12 @@ export const getUserCars = () => {
     withCredentials: true, //activations des cokkies
   });
 };
+
+export const deleteCarByID = (carId) => {
+  return axios.delete(`${apiurl}/deleteCarByID`,
+     {
+      data: { carId:carId } , 
+    withCredentials: true, //activations des cokkies
+  });
+};
+
