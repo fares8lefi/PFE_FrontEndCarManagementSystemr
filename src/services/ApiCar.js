@@ -30,3 +30,8 @@ export const deleteCarByID = (carId) => {
   });
 };
 
+export const UpdateCarById = (carId, updatedData) => {
+  return axios.put(`${apiurl}/UpdateCarById/${carId}`, updatedData, {
+    withCredentials: true,
+  });
+};
