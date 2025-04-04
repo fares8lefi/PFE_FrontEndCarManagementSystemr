@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { addUserClientImgOf } from "../services/ApiUser";
+import Footer from '../components/Footer';
 
 export default function Singup() {
   const Password = useRef(null);
@@ -15,7 +16,7 @@ export default function Singup() {
     if (e.target.name === "user_image") {
       // Vérification améliorée du fichier
       if (!e.target.files || e.target.files.length === 0) {
-        alert("Veuillez sélectionner une image !");
+        alert("veuillez-vous sélectionner une image !");
         return;
       }
 
@@ -119,6 +120,8 @@ export default function Singup() {
           </button>
         </div>
       </section>
+      <Footer/>
     </div>
+    
   );
 }
