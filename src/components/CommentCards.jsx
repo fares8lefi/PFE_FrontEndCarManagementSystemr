@@ -6,30 +6,27 @@ export default function CommentCards({ carId }) {
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState("");
 
- 
   const handleChange = (e) => {
     setNewComment(e.target.value);
   };
 
-  // Fonction qui envoyer le commentaire
-  const submitComment = async () => {
+  // envoie le commentaire
+  const submitComment = async (e) => {
+    e.preventDefault();
     try {
       await addComment(carId, newComment);
       setNewComment("");
       setError("");
-      await Comments();
+      await getComments();
     } catch (error) {
       setError(
-        error.response?.data?.message ||
-          "Erreur lors de l'ajout du commentaire"
+        error.response?.data?.message
       );
     }
   };
 
-  
-
-  // Fonction pour récupérer les commentaires
-  const Comments = async () => {
+  // récupérer les commentaires
+  const getComments = async () => {
     try {
       const response = await getCommentsByCar(carId);
       setComments(response.data.comments || []);
@@ -41,7 +38,7 @@ export default function CommentCards({ carId }) {
 
   useEffect(() => {
     if (carId) {
-      Comments();
+      getComments();
     }
   }, [carId]);
 
@@ -81,6 +78,13 @@ export default function CommentCards({ carId }) {
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
+                {comment.userId.user_image && (
+                  <img
+                    src={comment.userId.user_image}
+                    alt={`${comment.userId.username}'s avatar`}
+                    className="h-10 w-10 rounded-full object-cover mr-2"
+                  />
+                )}
                 <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
                   {comment.userId.username}
                 </span>
