@@ -58,7 +58,7 @@ export default function CarCards() {
 
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mx-24 mt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mx-24 mt-6 mb-6">
       {cars.length === 0 ? (
         <p className="col-span-full text-center">aucune voiture trouvée.</p>
       ) : (
