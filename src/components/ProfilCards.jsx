@@ -25,7 +25,6 @@ export default function ProfileCard() {
     UserData();
   }, []);
 
-    if (file) {
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4">
       {/* carte de profil */}

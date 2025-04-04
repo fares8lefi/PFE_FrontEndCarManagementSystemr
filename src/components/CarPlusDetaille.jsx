@@ -73,8 +73,21 @@ export default function CarPlusDetaille() {
         <p className="font-semibold text-gray-700">Énergie</p>
         <p className="text-lg text-blue-600">{car.Energie}</p>
       </span>
+      
     </div>
   </div>
   
   );
 }
+{/*
+   <a  
+         href="#"
+                className="w-8 h-8  rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
+              >
+                <img
+                  src="../public/favori.png"
+                  alt="Tik Tok icon"
+                  className="w-7 h-7 fill-current text-white"
+                />
+                <span className="sr-only">Tik Tok</span>
+              </a>*/}
