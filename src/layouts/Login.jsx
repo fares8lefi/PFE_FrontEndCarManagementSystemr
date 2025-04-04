@@ -3,6 +3,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import {loginUser} from '../services/ApiUser'
 import { useNavigate } from 'react-router-dom';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import GoogleIcon from '@mui/icons-material/Google';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ export default function Login() {
     
     try {
       const response = await loginUser(loginData);
+      
       console.log(response.data.token)
      
       if (response.data?.success) {
@@ -28,7 +31,7 @@ export default function Login() {
       if (userRole === 'admin') {
         navigate('/usersTable');  
       } else {
-        navigate('/carCards');  
+        navigate('/home');  
       }
       } else {
         alert(response.data?.message || "authentification echouée");
@@ -39,6 +42,8 @@ export default function Login() {
       alert(error.response?.data?.message || "erreur du connexion");
     }
   };
+  const handleSinUp = () => navigate('/singup');
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -48,8 +53,8 @@ export default function Login() {
           <p className="text-gray-600 text-center mb-4">Let's Get Started </p>
           
           <button className="flex items-center justify-center w-full border border-gray-300 rounded-3xl py-2 mb-4">
-            <img src="/google-icon.png" alt="Google" className="w-5 h-5 mr-2" />
-            Login with Google
+            
+              <GoogleIcon  fontSize="small" className='mx-2' /> Login with Google
           </button>
           
           <div className="flex items-center my-4">
@@ -82,6 +87,7 @@ export default function Login() {
           </div>
           
           <button className="bg-black w-full rounded-3xl py-3 text-white text-center font-semibold"
+          
           onClick={login}>LogIn</button>
           
           <div className="flex items-center my-4">
@@ -91,12 +97,18 @@ export default function Login() {
           </div>
           
           <button className="flex items-center justify-center w-full border border-gray-300 rounded-3xl py-2">
-            <img src="/facebook-icon.png" alt="Facebook" className="w-5 h-5 mr-2" />
-            Login with Facebook
+            
+          <FacebookIcon  fontSize="small" className='mx-2' /> Login with Facebook
           </button>
           
           <p className="text-center text-sm mt-4 text-gray-600">
-            Don't have an account? <a href="#" className="text-blue-600">Create an account</a>
+            Don't have an account?{' '}
+            <button 
+              onClick={handleSinUp} 
+              className="text-blue-600 hover:underline cursor-pointer"
+            >
+              Create an account
+            </button>
           </p>
         </div>
       </section>
