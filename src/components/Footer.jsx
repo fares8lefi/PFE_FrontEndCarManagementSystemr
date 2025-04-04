@@ -1,37 +1,36 @@
-import {React,useState  }from "react";
-import {addNewsLetter } from "../services/ApiNewsLetter";
-
+import { React, useState } from "react";
+import { addNewsLetter } from "../services/ApiNewsLetter";
+import { Facebook, Instagram, Twitter } from '@mui/icons-material';
 
 export default function Footer() {
-   const [newsLetter, setNewsLetter] = useState({
-    email:""
-   });
-  
+  const [newsLetter, setNewsLetter] = useState({ email: "" });
 
-   const handleChange =(e)=>{
-    const {name ,value} =e.target;
-    setNewsLetter({...newsLetter,[name]:value})
-  }
-  const submitnewsLetter=async()=>{
-    try{
-       await addNewsLetter(newsLetter);
-      alert("vous éte bien inscrit a news Letter ")
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewsLetter({ ...newsLetter, [name]: value });
+  };
+
+  const submitNewsLetter = async () => {
+    try {
+      await addNewsLetter(newsLetter);
+      alert("Vous êtes bien inscrit à la newsletter");
+    } catch (error) {
+      console.error("Erreur d'inscription :", error);
+      alert("Une erreur est survenue lors de l'inscription");
     }
-    catch(error){
-      console.log(error)
-    }
-  }
+  };
+
   return (
     <footer className="relative bg-gray-900 bg-[url('../public/background.jpg')] bg-cover bg-center text-gray-300 py-12 px-6 md:px-12">
-      {/* Overlay semi-transparent */}
       <div className="absolute inset-0 bg-sky-900/80 mix-blend-multiply"></div>
 
       <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 z-10">
         {/* Newsletter Section */}
         <div className="space-y-4">
-          <div className=" text-32 text-blue-50 mb-20">
-            Research has had a very large influence <br /> on my life. I have
-            learned <br /> most of what I know through research.
+          <div className="text-3xl text-blue-50 mb-8">
+            Research has had a very large influence <br />
+            on my life. I have learned <br />
+            most of what I know through research.
           </div>
           <h3 className="text-xl font-bold text-white mb-4">Newsletter</h3>
           <div className="relative">
@@ -42,8 +41,9 @@ export default function Footer() {
               placeholder="Your Email"
               className="w-full p-3 bg-white/10 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 backdrop-blur-sm"
             />
-            <button className="absolute right-2 top-2 bg-blue-500 text-white px-4 py-1 rounded-3xl hover:bg-blue-600 transition-transform duration-200"
-            onClick={submitnewsLetter}
+            <button
+              onClick={submitNewsLetter}
+              className="absolute right-2 top-2 bg-blue-500 text-white px-4 py-1 rounded-3xl hover:bg-blue-600 transition-colors duration-200"
             >
               Subscribe
             </button>
@@ -51,17 +51,17 @@ export default function Footer() {
         </div>
 
         {/* Address Section */}
-        <div className="space-y-3 ">
+        <div className="space-y-3">
           <h4 className="text-lg font-semibold text-white">Address</h4>
-          <p className="text-sm mt-4">
+          <address className="text-sm mt-4 not-italic">
             Mahdia Sidi Massoude
             <br />
             Mahdia - 5100
             <br />
-            Email : karhabti@gmail.com
+            Email: karhabti@gmail.com
             <br />
             Phone: +216 50 746 656
-          </p>
+          </address>
         </div>
 
         {/* Quick Links Section */}
@@ -99,39 +99,25 @@ export default function Footer() {
                 href="#"
                 className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
               >
-                <img
-                  src="../public/facebookicon.png"
-                  alt="Facebook icon"
-                  className="w-7 h-7 fill-current text-white"
-                />
+                <Facebook className="text-white text-xl" />
                 <span className="sr-only">Facebook</span>
               </a>
 
               <a
                 href="#"
-                className="w-8 h-8  rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
               >
-                <img
-                  src="../public/tiktok.png"
-                  alt="Tik Tok icon"
-                  className="w-7 h-7 fill-current text-white"
-                />
-                <span className="sr-only">Tik Tok</span>
+                <Instagram className="text-white text-xl" />
+                <span className="sr-only">Instagram</span>
               </a>
 
               <a
                 href="#"
-                className="w-7 h-7  rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
               >
-                <img
-                  src="../public/instagra.png"
-                  alt="Instagram icon"
-                  className="w-6 h-6 fill-current text-white"
-                />
-                <span className="sr-only">Instagram</span>
+                <Twitter className="text-white text-xl" />
+                <span className="sr-only">Twitter</span>
               </a>
-
-              
             </div>
           </div>
         </div>
