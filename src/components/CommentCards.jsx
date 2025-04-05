@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getCommentsByCar, addComment } from "../services/ApiComment";
-
+import AOS from 'aos'; 
+import 'aos/dist/aos.css';
 export default function CommentCards({ carId }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
@@ -35,15 +36,26 @@ export default function CommentCards({ carId }) {
       setComments([]);
     }
   };
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true
+    });
+  }, []);
+  useEffect(() => {
+    AOS.refresh();
+  }, [comments]);
 
   useEffect(() => {
     if (carId) {
       getComments();
     }
   }, [carId]);
-
+ 
   return (
+    <div data-aos="fade-up">
     <div className="space-y-4 mt-6 p-8">
+    <div data-aos="fade-up">
       <form onSubmit={submitComment} className="flex gap-4 items-center">
         <input
           type="text"
@@ -59,7 +71,9 @@ export default function CommentCards({ carId }) {
         >
           Ajouter
         </button>
+
       </form>
+      </div>
       {error && (
         <div className="text-red-500 text-center mt-2">{error}</div>
       )}
@@ -76,6 +90,7 @@ export default function CommentCards({ carId }) {
             key={comment._id}
             className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
           >
+            
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
                 {comment.userId.user_image && (
@@ -97,8 +112,12 @@ export default function CommentCards({ carId }) {
               {comment.content}
             </p>
           </div>
+          
         ))
+        
       )}
+      
+    </div>
     </div>
   );
 }
