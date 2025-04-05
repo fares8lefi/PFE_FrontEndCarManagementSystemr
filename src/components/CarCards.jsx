@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getAllCars } from "../services/ApiCar";
 import { addCarToFavorites } from "../services/ApiFavoris";
 import FavoriteIcon from '@mui/icons-material/Favorite';
-
+import AOS from 'aos'; 
+import 'aos/dist/aos.css';
 
 export default function CarCards() {
   const [cars, setCars] = useState([]);
@@ -36,6 +37,17 @@ export default function CarCards() {
         });
   };
 
+  useEffect(() => {
+      AOS.init({
+        duration: 1000,
+        once: true
+      });
+    }, []);
+      useEffect(() => {
+        AOS.refresh();
+      }, []);
+    
+
   const addFavoris = async (carId, e) => {
     e.stopPropagation();// pour n'acceder pas aux detaiiles
     try {
@@ -58,6 +70,7 @@ export default function CarCards() {
 
 
   return (
+    <div data-aos="fade-up">
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mx-24 mt-6 mb-6">
       {cars.length === 0 ? (
         <p className="col-span-full text-center">aucune voiture trouvée.</p>
@@ -111,5 +124,7 @@ export default function CarCards() {
         ))
       )}
     </div>
+    </div>
+
   );
 }
