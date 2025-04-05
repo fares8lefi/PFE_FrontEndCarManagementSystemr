@@ -1,110 +1,119 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 import { getUsersbyId } from "../services/ApiUser";
 import LoginIcon from '@mui/icons-material/Login';
+import { PropagateLoader } from 'react-spinners'; 
 
 function Navbar() {
   const [user, setUser] = useState({ user_image: null });
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('authToken');
 
-  const UserData = async () => {
-    try {
-      const response = await getUsersbyId();
-      if (response?.data?.user?.user_image) {
-        setUser({ user_image: response.data.user.user_image });
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     if (isLoggedIn) {
-      UserData();
+      getUsersbyId()
+        .then(response => {
+          setUser({
+            user_image: response?.data?.user?.user_image || null
+          });
+        })
+        .catch(() => setUser({ user_image: null }))
+        .finally(() => setLoading(false));
     } else {
-      setUser({ user_image: null }); 
+      setUser({ user_image: null });
+      setLoading(false);
     }
   }, [isLoggedIn]);
-// nvaigation 
-
 
   const handleLogin = () => navigate('/login');
   const handleProfile = () => navigate('/profil');
-  
+
+  const NavigationLink = ({ to, children }) => (
+    <li>
+      <Link 
+        to={to} 
+        className="hover:text-blue-400 transition-colors duration-200"
+      >
+        {children}
+      </Link>
+    </li>
+  );
+
   return (
-    <div className='bg-sky-900 text-white w-full min-w-md h-16 md:h-20 flex items-center'>
-      <nav className='container mx-auto flex flex-col md:flex-row justify-between items-center px-4 h-full gap-2 md:gap-0'>
-        
-        {/*logo et nom */}
-        <div className='flex items-center gap-2 w-full md:w-auto justify-between'>
-          <div className='flex items-center gap-2 flex-none'>
-            <img 
-              src='/logo.png' 
-              alt='Logo' 
-              className='h-8 w-8 md:h-10 md:w-10 object-contain' 
-            />
-            <span className='text-xs md:text-sm lg:text-base font-bold truncate'>AutoMarket</span>
-          </div>
+    <div className="bg-sky-900 text-white w-full shadow-lg">
+      <nav className="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+        {/* Logo et nom */}
+        <Link 
+          to="/" 
+          className="flex items-center gap-2 flex-shrink-0 hover:opacity-90 transition-opacity"
+        >
+          <img 
+            src="/logo.png" 
+            alt="Logo" 
+            className="h-10 w-10 object-contain" 
+          />
+          <span className="text-base font-bold truncate">AutoMarket</span>
+        </Link>
 
-          {/* bouton login version mobile */}
-          {!isLoggedIn && (
-            <button 
-              onClick={handleLogin}
-              className='md:hidden bg-blue-500 hover:bg-blue-600 px-4 py-1 rounded-full 
-                       text-xs transition-colors duration-300 flex items-center gap-1'
-            >
-              <span>Login</span>
-            </button>
-          )}
+        {/* navigation */}
+        <div className="flex-grow flex justify-center">
+          <ul className="flex gap-6 text-sm font-medium">
+            <NavigationLink to="/">Home</NavigationLink>
+            <NavigationLink to="/about-us">About Us</NavigationLink>
+            <NavigationLink to="/services">Services</NavigationLink>
+            <NavigationLink to="/contact">Contact</NavigationLink>
+          </ul>
         </div>
 
-        {/* menu principal responsive */}
-        <div className='w-full md:w-auto flex-1 flex justify-center'>
-          <div className='flex flex-wrap justify-center gap-2 md:gap-4 lg:gap-6 text-sm'>
-            <a href='/' className='hover:text-blue-400 px-2 py-1'>Home</a>
-            <a href='/' className='hover:text-blue-400 px-2 py-1'>Neufs</a>
-            <a href='/' className='hover:text-blue-400 px-2 py-1'>Occasion</a>
-            <a href='/' className='hover:text-blue-400 px-2 py-1'>Inventory</a>
-            <a href='/' className='hover:text-blue-400 px-2 py-1'>Contact</a>
-          </div>
-        </div>
-
-        {/* section droite conditionnelle */}
-        <div className='w-full md:w-auto flex justify-end items-center gap-4'>
-          {isLoggedIn ? (
+        {/* login botton ou barre de recherche et user image  */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <PropagateLoader 
+                color="#3B82F6"
+                size={10}
+                speedMultiplier={0.8}
+              />
+            </div> 
+          ) : isLoggedIn ? (
             <>
-              <div className='relative w-full md:max-w-md'>
+              <div className="relative w-full max-w-md min-w-[200px]">
                 <input
-                  type='text'
-                  placeholder='Rechercher...'
-                  className='w-full pl-3 pr-8 py-1 md:py-2 rounded-full bg-white/10 
-                           text-xs md:text-sm placeholder-gray-300 focus:outline-none focus:ring-1 
-                           focus:ring-blue-400 transition-all duration-300'
+                  type="text"
+                  placeholder="Rechercher..."
+                  className="w-full pl-3 pr-10 py-2 rounded-full bg-white/10 text-sm placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all duration-300"
+                  aria-label="Barre de recherche"
                 />
                 <svg
-                  className='w-4 h-4 absolute right-2 top-2 text-gray-300'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
+                  className="w-4 h-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                  />
                 </svg>
               </div>
-              
-              {/* avatar utilisateur */}
+
               <button
                 onClick={handleProfile}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-200"
+                className="w-10 h-10 rounded-full overflow-hidden border border-white hover:border-blue-400 transition-colors"
+                aria-label="Profil utilisateur"
               >
                 {user.user_image ? (
                   <img
                     src={user.user_image}
                     alt="Profil"
-                    className="w-full h-full rounded-full object-cover"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-gray-600 flex items-center justify-center">
+                  <div className="w-full h-full bg-gray-600 flex items-center justify-center">
                     <span className="text-xs">?</span>
                   </div>
                 )}
@@ -113,8 +122,8 @@ function Navbar() {
           ) : (
             <button 
               onClick={handleLogin}
-              className='hidden md:flex bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-full 
-                       text-sm transition-colors duration-300 items-center gap-1'
+              className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-full text-sm flex items-center gap-1 transition-colors"
+              aria-label="Se connecter"
             >
               <LoginIcon fontSize="small" />
               <span>Login</span>
