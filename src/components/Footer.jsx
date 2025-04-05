@@ -1,7 +1,8 @@
-import { React, useState } from "react";
+import { React, useState ,useEffect } from "react";
 import { addNewsLetter } from "../services/ApiNewsLetter";
 import { Facebook, Instagram, Twitter } from '@mui/icons-material';
-
+import AOS from 'aos'; 
+import 'aos/dist/aos.css';
 export default function Footer() {
   const [newsLetter, setNewsLetter] = useState({ email: "" });
 
@@ -19,8 +20,19 @@ export default function Footer() {
       alert("Une erreur est survenue lors de l'inscription");
     }
   };
-
+ useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true
+    });
+  }, []);
+    useEffect(() => {
+      AOS.refresh();
+    }, []);
+  
   return (
+    
+    <div data-aos="fade-up">
     <footer className="relative bg-gray-900 bg-[url('../public/background.jpg')] bg-cover bg-center text-gray-300 py-12 px-6 md:px-12">
       <div className="absolute inset-0 bg-sky-900/80 mix-blend-multiply"></div>
 
@@ -123,5 +135,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </div>
   );
 }
