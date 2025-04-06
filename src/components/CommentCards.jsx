@@ -51,7 +51,16 @@ export default function CommentCards({ carId }) {
       getComments();
     }
   }, [carId]);
- 
+  // format data 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
   return (
     <div data-aos="fade-up">
     <div className="space-y-4 mt-6 p-8">
@@ -104,7 +113,7 @@ export default function CommentCards({ carId }) {
                   {comment.userId.username}
                 </span>
                 <span className="ml-4 text-sm text-gray-500">
-                  {comment.createdAt}
+                {formatDate(comment.createdAt)}
                 </span>
               </div>
             </div>
