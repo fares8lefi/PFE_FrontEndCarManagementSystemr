@@ -13,6 +13,7 @@ import CommentCards from './components/CommentCards.jsx'
 import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
 import ProfilCard from './components/ProfilCards.jsx'
 import Favoris from './components/favoris.jsx'
+import Notifications from './components/notificationsCards.jsx'
 import UserCars from './components/UserCars.jsx'
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/Footer" element={<Footer />} />
         <Route path="/login" element={<Login />} />
         <Route path="/singup" element={<Singup />} />
+        <Route path="/notifications" element={< Notifications/>} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/UsersTable" element={<UsersTable />} />
         <Route path="/carCards" element={<CarCards />} />
