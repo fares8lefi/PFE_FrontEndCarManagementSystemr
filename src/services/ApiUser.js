@@ -35,7 +35,7 @@ export async function UpdateUserClientbyId(formData) {
   return await axios.put(`${apiurl}/UpdateUserClientbyId`, formData, {
     withCredentials: true,
     headers: {
-      'Content-Type': 'multipart/form-data' 
+      'Content-Type': 'multipart/form-data'
     }
   });
 }
