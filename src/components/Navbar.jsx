@@ -19,7 +19,7 @@ function Navbar() {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("authToken");
   const dropdownRef = useRef(null);
-
+  const [searchTerm, setSearchTerm] = useState("");
   // Gestion des clics exterieurs
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -92,7 +92,7 @@ function Navbar() {
 
       const interval = setInterval(() => {
         getNotifications();
-      }, 3000); // Toutes les 30 secondes
+      }, 300000); // Toutes les 30 secondes
 
       return () => clearInterval(interval);
     }
@@ -105,13 +105,17 @@ function Navbar() {
     <li>
       <Link
         to={to}
-        className="hover:text-blue-400 transition-colors duration-200"
-      >
+        className="hover:text-blue-400 transition-colors duration-200">
         {children}
       </Link>
     </li>
   );
-
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/search?marque=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("fr-FR", {
       day: "numeric",
@@ -123,7 +127,7 @@ function Navbar() {
   };
 
   return (
-    <div className="bg-sky-900 text-white w-full shadow-lg relative">
+    <div className="bg-sky-900 text-white w-full shadow-lg fixed top-0 z-50">
       <nav className="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
         <Link
           to="/"
@@ -153,12 +157,16 @@ function Navbar() {
           ) : isLoggedIn ? (
             <>
               <div className="relative w-full max-w-md min-w-[200px]">
-                <input
-                  type="text"
-                  placeholder="Rechercher..."
-                  className="w-full pl-3 pr-10 py-2 rounded-full bg-white/10 text-sm placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all duration-300"
-                  aria-label="Barre de recherche"
-                />
+                <form onSubmit={handleSearchSubmit}>
+                  <input
+                    type="text"
+                    placeholder="Rechercher par marque..."
+                    className="w-full pl-3 pr-10 py-2 rounded-full bg-white/10 text-sm placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all duration-300"
+                    aria-label="Barre de recherche"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </form>
               </div>
 
               <div className="relative" ref={dropdownRef}>
@@ -241,7 +249,7 @@ function Navbar() {
                   </div>
                 )}
               </button>
-            </>
+              </>
           ) : (
             <button
               onClick={handleLogin}
@@ -255,12 +263,10 @@ function Navbar() {
           )}
         </div>
       </nav>
-
       <InitAOS />
     </div>
   );
 }
-
 const InitAOS = () => {
   useEffect(() => {
     AOS.init({
