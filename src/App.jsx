@@ -8,6 +8,7 @@ import Home  from './layouts/home.jsx'
 import UsersTable from './components/UsersTable.jsx'
 import CarCards from './components/CarCards.jsx'
 import CarDetaille from './layouts/CarDetaille.jsx'
+import Search from './layouts/search.jsx'
 import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
 import CommentCards from './components/CommentCards.jsx'
 import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
@@ -15,6 +16,7 @@ import ProfilCard from './components/ProfilCards.jsx'
 import Favoris from './components/favoris.jsx'
 import Notifications from './components/notificationsCards.jsx'
 import UserCars from './components/UserCars.jsx'
+import SideBar from './components/FilterSidebar.jsx'
 function App() {
   return (
     <>
@@ -25,11 +27,13 @@ function App() {
         <Route path="/Footer" element={<Footer />} />
         <Route path="/login" element={<Login />} />
         <Route path="/singup" element={<Singup />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/notifications" element={< Notifications/>} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/UsersTable" element={<UsersTable />} />
         <Route path="/carCards" element={<CarCards />} />
         <Route path="/favoris" element={<Favoris />} />
+        <Route path="/sideBar" element={<SideBar />} />
         <Route path='/carDetaille/:id' element={<CarDetaille/>}></Route>
         <Route path='/carPlusDetaille/:id' element={<CarPlusDetaille/>}></Route>
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
