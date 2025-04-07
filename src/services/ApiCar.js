@@ -40,3 +40,7 @@ export const getCarsByMarque = (marque) =>
   axios.get(`${apiurl}/getCarsByMarque`, { params: { marque } });
 
 
+export const getCarsFiltered = (marque, filters = {}) => {
+  const params = { marque, ...filters };
+  return axios.get(`${apiurl}/getCarsFiltered`, { params });
+};
