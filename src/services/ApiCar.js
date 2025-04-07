@@ -35,3 +35,8 @@ export const UpdateCarById = (carId, updatedData) => {
     withCredentials: true,
   });
 };
+
+export const getCarsByMarque = (marque) =>
+  axios.get(`${apiurl}/getCarsByMarque`, { params: { marque } });
+
+
