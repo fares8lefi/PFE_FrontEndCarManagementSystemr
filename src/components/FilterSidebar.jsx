@@ -1,34 +1,35 @@
-import React, { useState } from 'react';
-import { GiCarKey, GiGasPump, GiGearStick } from 'react-icons/gi';
+import React, { useState } from "react";
+import { GiCarKey, GiGasPump, GiGearStick } from "react-icons/gi";
 
-const FilterSidebar = ({ onFilterChange }) => {
+const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
   const [priceRange, setPriceRange] = useState([0, 100000]);
-  const [yearRange, setYearRange] = useState([1990, new Date().getFullYear()]);
+  const [yearRange, setYearRange] = useState([1970, new Date().getFullYear()]);
   const [mileage, setMileage] = useState(300000);
-  const [selectedEnergy, setSelectedEnergy] = useState('');
-  const [selectedTransmission, setSelectedTransmission] = useState('');
+  const [selectedEnergy, setSelectedEnergy] = useState("");
+  const [selectedTransmission, setSelectedTransmission] = useState("");
 
-  const energyTypes = ['Essence', 'Diesel', 'Hybride', 'Électrique'];
-  const transmissionTypes = ['Automatique', 'Manuelle'];
+  const energyTypes = ["Essence", "Diesel", "Hybride", "Électrique"];
+  const transmissionTypes = ["Automatique", "Manuelle"];
 
   const handleApplyFilters = () => {
     onFilterChange({
+      marque: searchedMarque, // 👈 garde la marque originale !
       minPrice: priceRange[0],
       maxPrice: priceRange[1],
       minYear: yearRange[0],
       maxYear: yearRange[1],
       maxMileage: mileage,
       energy: selectedEnergy,
-      transmission: selectedTransmission
+      transmission: selectedTransmission,
     });
   };
 
   const handleReset = () => {
     setPriceRange([0, 100000]);
-    setYearRange([1990, new Date().getFullYear()]);
+    setYearRange([1970, new Date().getFullYear()]);
     setMileage(300000);
-    setSelectedEnergy('');
-    setSelectedTransmission('');
+    setSelectedEnergy("");
+    setSelectedTransmission("");
     onFilterChange({});
   };
 
@@ -45,14 +46,31 @@ const FilterSidebar = ({ onFilterChange }) => {
         className="w-full range-slider"
       />
       <div className="flex justify-between text-sm mt-2">
-        <span>{min.toLocaleString()}{unit}</span>
-        <span>{value.toLocaleString()}{unit}</span>
-        <span>{max.toLocaleString()}{unit}</span>
+        <span>
+          {min.toLocaleString()}
+          {unit}
+        </span>
+        <span>
+          {value.toLocaleString()}
+          {unit}
+        </span>
+        <span>
+          {max.toLocaleString()}
+          {unit}
+        </span>
       </div>
     </div>
   );
 
-  const CustomRangeSlider = ({ min, max, value, onChange, label, unit, step }) => {
+  const CustomRangeSlider = ({
+    min,
+    max,
+    value,
+    onChange,
+    label,
+    unit,
+    step,
+  }) => {
     const handleMinChange = (e) => {
       const newMin = Number(e.target.value);
       onChange([newMin, value[1]]);
@@ -90,13 +108,19 @@ const FilterSidebar = ({ onFilterChange }) => {
               className="absolute h-full bg-blue-500 rounded-full"
               style={{
                 left: `${((value[0] - min) / (max - min)) * 100}%`,
-                right: `${100 - ((value[1] - min) / (max - min)) * 100}%`
+                right: `${100 - ((value[1] - min) / (max - min)) * 100}%`,
               }}
             ></div>
           </div>
           <div className="flex justify-between text-sm mt-2">
-            <span>{value[0].toLocaleString()}{unit}</span>
-            <span>{value[1].toLocaleString()}{unit}</span>
+            <span>
+              {value[0].toLocaleString()}
+              {unit}
+            </span>
+            <span>
+              {value[1].toLocaleString()}
+              {unit}
+            </span>
           </div>
         </div>
       </div>
@@ -122,7 +146,7 @@ const FilterSidebar = ({ onFilterChange }) => {
 
       <CustomRangeSlider
         label="Année"
-        min={1990}
+        min={1970}
         max={new Date().getFullYear()}
         value={yearRange}
         onChange={setYearRange}
