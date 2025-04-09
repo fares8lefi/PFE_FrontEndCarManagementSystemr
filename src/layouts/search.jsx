@@ -13,31 +13,32 @@ export default function Search() {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({});
 
-  
-    const searchParams = new URLSearchParams(location.search);
-    const marque = searchParams.get("marque");
+  const searchParams = new URLSearchParams(location.search);
+  const marque = searchParams.get("marque");
 
-    const getCars = async () => {
-      try {
-        let response;
-        if (Object.keys(filters).length === 0) {
-          // Recherche  par marque (recherche intiale)
-          response = await getCarsByMarque(marque);
-        } else {
-          //  rechercher avec les filtres filtres
-          response = await getCarsFiltered({ marque, ...filters });
-        }
+  const getCars = async () => {
+    try {
+      setIsLoading(true);
+      let response;
+      const filtereByMarque = { ...filters, marque };
 
-        if (response.data.cars) {
-          setCars(response.data.cars);
-        }
-      } catch (err) {
-        setError(err.response?.data?.message);
-      } finally {
-        setIsLoading(false);
+      if (Object.keys(filters).length === 0) {
+        response = await getCarsByMarque(marque); // Recherche initiale
+      } else {
+        response = await getCarsFiltered(filtereByMarque); // Filtres + marque
       }
-    };
-    useEffect(() => {
+
+      if (response.data.cars) {
+        setCars(response.data.cars);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Erreur de chargement");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     getCars();
   }, [location.search, filters]);
 
@@ -50,8 +51,7 @@ export default function Search() {
 
         <div className="ml-64 p-8 flex-1">
           <h1 className="text-3xl font-bold mb-8 border-b pb-4">
-            Résultats pour "{new URLSearchParams(location.search).get("marque")}
-            "
+            Résultats pour "{marque}"
           </h1>
 
           {isLoading ? (
@@ -64,7 +64,12 @@ export default function Search() {
             <div className="text-center py-12">
               <GiCarKey className="mx-auto text-6xl text-gray-400 mb-4" />
               <p className="text-gray-500 text-xl">
-                aucun véhicule touvé 
+                Aucun véhicule trouvé pour la marque <strong>"{marque}"</strong>{" "}
+                avec les filtres sélectionnés.
+              </p>
+              <p className="text-sm text-gray-400 mt-2">
+                Essayez d'élargir vos critères de recherche pour voir plus de
+                résultats.
               </p>
             </div>
           ) : (
