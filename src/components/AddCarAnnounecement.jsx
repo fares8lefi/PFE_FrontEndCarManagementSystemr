@@ -1,6 +1,6 @@
 import { React, useState } from "react";
 import { addCarImages } from "../services/ApiCar";
-
+import Navbar from "./Navbar";
 export default function AddCarAnnounecement() {
   const [carData, setCarData] = useState({
     marque: "",
@@ -14,7 +14,7 @@ export default function AddCarAnnounecement() {
     Position: "",
     description: "",
   });
-  
+
   const [images, setImages] = useState([]);
   const [qrCode, setQrCode] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,11 +25,11 @@ export default function AddCarAnnounecement() {
       [name]: value,
     }));
   };
-  
+
   const handleImageChange = (e) => {
     setImages(Array.from(e.target.files)); // Convertir FileList en tableau
   };
-  
+
   const SubmitAnounnce = async (e) => {
     e.preventDefault();
     const authToken = localStorage.getItem("authToken");
@@ -37,22 +37,22 @@ export default function AddCarAnnounecement() {
       alert("Vous êtes non connecté");
       return;
     }
-  
+
     try {
       const submitCarData = new FormData();
-  
+
       // Ajouter les données de la voiture
       Object.keys(carData).forEach((key) => {
         submitCarData.append(key, carData[key]);
       });
-  
+
       // Ajouter les images
       images.forEach((file) => {
         submitCarData.append("images", file);
       });
-  
+
       const response = await addCarImages(submitCarData);
-  
+
       if (response.data) {
         alert("Annonce publiée!");
         setQrCode(response.data.qrCode);
@@ -68,6 +68,7 @@ export default function AddCarAnnounecement() {
   };
   return (
     <div className="w-full min-w-xl">
+      <Navbar />
       <p className="text-xl text-center mt-24 font-bold mb-8">
         Best deals ? Create your announcement here
       </p>
@@ -207,7 +208,11 @@ export default function AddCarAnnounecement() {
           <div className="relative bg-white rounded-lg p-6 z-10 max-w-xs w-full text-center">
             <h2 className="text-lg font-bold mb-4">QR Code de l'annonce</h2>
             {qrCode ? (
-              <img src={qrCode} alt="QR Code de l'annonce" className="mx-auto" />
+              <img
+                src={qrCode}
+                alt="QR Code de l'annonce"
+                className="mx-auto"
+              />
             ) : (
               <p>Aucun QR code généré</p>
             )}
