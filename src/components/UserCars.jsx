@@ -6,7 +6,11 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 //import { TbAutomaticGearboxFilled } from "react-icons/tb";
 import { TbAdjustmentsAlt } from "react-icons/tb";
-
+import { useNavigate } from "react-router-dom";
+import { PropagateLoader } from 'react-spinners';
+import { GiGasPump, GiCarKey } from 'react-icons/gi';
+import { MdOutlineElectricalServices, MdDateRange } from 'react-icons/md';
+import { TbManualGearbox } from 'react-icons/tb';
 
 export default function UserCars() {
   const [cars, setCars] = useState([]);
@@ -64,11 +68,12 @@ export default function UserCars() {
       },
     }));
   };
-
+  const navigate = useNavigate();
+  const handleAddCarAnnounecement = () => navigate("/addCarAnnounecement");
   useEffect(() => {
     getCars();
   }, []);
-
+  
   return (
     <div className="p-4 max-w-4xl mx-auto">
       {/*formulaire de modification */}
@@ -120,7 +125,15 @@ export default function UserCars() {
           </div>
         </div>
       )}
-
+       <div className="mb-6 flex justify-end">
+        <button
+          onClick={handleAddCarAnnounecement}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+        >
+          <span>+</span>
+          Ajouter une annonce
+        </button>
+      </div>
       {/* liste des voitures */}
       <div className="space-y-4">
         {cars.map((car) => (
@@ -146,32 +159,25 @@ export default function UserCars() {
                 <h3 className="text-xl font-bold">
                   {car.marque} {car.model}
                 </h3>
-                <p className="text-gray-600"><CalendarMonthIcon fontSize="small" /> {car.year}</p>
+                <p className="text-gray-600"><MdDateRange fontSize="small" /> {car.year}</p>
 
                 <div className="mt-2 flex flex-wrap gap-2">
                   <div className="flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm">
                     <span className="mr-1">
-                      <ElectricBoltIcon fontSize="small" />
+                      <GiGasPump fontSize="small" />
                     </span>
                     {car.Energie}
                   </div>
+                
                   <div className="flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm">
                     <span className="mr-1">
-                      <AttachMoneyIcon fontSize="small" />
-                    </span>
-                    {car.price}
-                  </div>
-                  <div className="flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm">
-                    <span className="mr-1">
-                      <TbAdjustmentsAlt fontSize="small" />
+                      < TbManualGearbox fontSize="small" />
                     </span>
                     {car.Boite}
                   </div>
-                  
-
-                  {/*
-                                    <Badge label={car.Boite} icon="⚙️" />
-                                    */}
+                  <div className="flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm">
+                    {car.price} TND
+                  </div>
                 </div>
 
                 {/* Actions */}
