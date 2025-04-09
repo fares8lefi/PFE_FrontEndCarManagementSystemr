@@ -39,8 +39,5 @@ export const UpdateCarById = (carId, updatedData) => {
 export const getCarsByMarque = (marque) =>
   axios.get(`${apiurl}/getCarsByMarque`, { params: { marque } });
 
-
-export const getCarsFiltered = (marque, filters = {}) => {
-  const params = { marque, ...filters };
-  return axios.get(`${apiurl}/getCarsFiltered`, { params });
-};
+export const getCarsFiltered = (filters = {}) =>
+  axios.get(`${apiurl}/getCarsFiltered`, { params: filters });
