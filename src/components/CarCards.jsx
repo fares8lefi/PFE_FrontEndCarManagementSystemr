@@ -149,7 +149,7 @@ export default function CarCards() {
 
                 <div className="mb-4 space-y-2">
                   <p className="text-2xl font-bold text-blue-600">
-                    {new Intl.NumberFormat('fr-FR').format(car.price)} €
+                    {new Intl.NumberFormat('fr-FR').format(car.price)} TND
                   </p>
                   <p className="text-sm text-gray-500">
                     Kilométrage : {new Intl.NumberFormat('fr-FR').format(car.km)} km
