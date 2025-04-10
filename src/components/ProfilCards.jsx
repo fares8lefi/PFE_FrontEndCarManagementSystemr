@@ -3,7 +3,7 @@ import { getUsersbyId } from "../services/ApiUser";
 import Favoris from "../components/Favoris";
 import UserCars from "../components/UserCars";
 import EditProfileForm from "../components/EditProfileForm";
-
+import Parametres from '../components/Parametres'
 export default function ProfileCard() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("informations");
@@ -67,7 +67,7 @@ export default function ProfileCard() {
               { id: "informations", label: "Informations" },
               { id: "mes-vehicules", label: "Mes véhicules" },
               { id: "favoris", label: "Favoris" },
-              { id: "parametres", label: "Paramètres" },
+              { id: "Parametres", label: "Parametres" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -89,6 +89,7 @@ export default function ProfileCard() {
       <div className="mt-6">
         {activeTab === "favoris" && <Favoris key="favoris" />}
         {activeTab === "mes-vehicules" && <UserCars key="mes-vehicules" />}
+        {activeTab === "Parametres" && <Parametres key="Parametres" />}
       </div>
 
       {showEditDialog && (
