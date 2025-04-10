@@ -13,10 +13,11 @@ import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
 import CommentCards from './components/CommentCards.jsx'
 import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
 import ProfilCard from './components/ProfilCards.jsx'
-import Favoris from './components/favoris.jsx'
+import Favoris from './components/Favoris.jsx'
 import Notifications from './components/notificationsCards.jsx'
 import UserCars from './components/UserCars.jsx'
 import SideBar from './components/FilterSidebar.jsx'
+import Parametres from './components/Parametres'
 function App() {
   return (
     <>
@@ -30,6 +31,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/notifications" element={< Notifications/>} />
         <Route path="/profil" element={<Profil />} />
+        <Route path="/parametres" element={<Parametres />} />
         <Route path="/UsersTable" element={<UsersTable />} />
         <Route path="/carCards" element={<CarCards />} />
         <Route path="/favoris" element={<Favoris />} />
