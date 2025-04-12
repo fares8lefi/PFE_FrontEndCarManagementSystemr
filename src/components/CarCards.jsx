@@ -78,7 +78,7 @@ export default function CarCards() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
+    <div className="container mx-auto px-4 py-8 min-h-screen mt-7">
       {loading ? (
         <div className="flex justify-center py-12">
           <PropagateLoader 
