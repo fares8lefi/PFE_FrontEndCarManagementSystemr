@@ -12,12 +12,12 @@ import {
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { PropagateLoader } from "react-spinners";
-import { getUsersbyId } from "../services/ApiUser";
+import { getUsersbyId ,logout} from "../services/ApiUser";
 export default function Parametres() {
-  // Navigation
+  
   const navigate = useNavigate();
 
-  // États
+  
   const [loading, setLoading] = useState(true);
   const [formLoading, setFormLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -55,6 +55,7 @@ export default function Parametres() {
     };
   }, []);
 
+  
   // Gestionnaires d'événements
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,6 +100,8 @@ export default function Parametres() {
 
   const handleLogout = async () => {
     try {
+      await logout()
+      localStorage.removeItem("authToken")
       navigate("/login");
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
