@@ -53,23 +53,22 @@ function Navbar() {
     setLoadingNotifications(true);
     try {
       const response = await getUserNotifications();
-      if (response.data?.success) {
+      
+      if (response.data?.success && response.data.notifications) {
         const fetchedNotifications = response.data.notifications;
         setNotifications(fetchedNotifications);
-
-        // compté les notifications non read
+  
         if (!hasViewedNotifications) {
           const newUnread = fetchedNotifications.filter((n) => !n.read).length;
           setUnreadCount(newUnread);
         }
       }
     } catch (error) {
-      console.error("Erreur de chargement des notifications:", error);
+      console.error(error);
     } finally {
       setLoadingNotifications(false);
     }
   }, [hasViewedNotifications]);
-
   // gestion d'evenment  clik sur l'icône de notifications
   const handleNotificationClick = async () => {
     const willShow = !showNotifications;
@@ -81,7 +80,7 @@ function Navbar() {
       if (unreadCount > 0) {
         await markAsRead();
         setHasViewedNotifications(true);
-        setUnreadCount(0); //insialisation de nombre de commentaire non read
+        setUnreadCount(0); 
       }
     }
   };
@@ -92,7 +91,7 @@ function Navbar() {
 
       const interval = setInterval(() => {
         getNotifications();
-      }, 300000); // Toutes les 30 secondes
+      }, 300000); 
 
       return () => clearInterval(interval);
     }
@@ -105,7 +104,8 @@ function Navbar() {
     <li>
       <Link
         to={to}
-        className="hover:text-blue-400 transition-colors duration-200">
+        className="hover:text-blue-400 transition-colors duration-200"
+      >
         {children}
       </Link>
     </li>
@@ -204,11 +204,15 @@ function Navbar() {
                             notifications.map((notification) => (
                               <div
                                 key={notification._id}
-                                className={`p-4 hover:bg-gray-50 cursor-pointer border-b last:border-b-0 transition-colors ${
-                                  !notification.read ? "bg-blue-50" : ""
+                                className={`p-4 border-b last:border-b-0 transition-colors ${
+                                  notification._id === "error"
+                                    ? "bg-red-50 text-red-600 font-semibold"
+                                    : !notification.read
+                                    ? "bg-blue-50"
+                                    : ""
                                 }`}
                               >
-                                <p className="text-sm text-gray-700">
+                                <p className="text-sm">
                                   {notification.content}
                                 </p>
                                 {notification.createdAt && (
@@ -249,7 +253,7 @@ function Navbar() {
                   </div>
                 )}
               </button>
-              </>
+            </>
           ) : (
             <button
               onClick={handleLogin}
