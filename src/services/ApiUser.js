@@ -39,3 +39,12 @@ export async function UpdateUserClientbyId(formData) {
     }
   });
 }
+
+
+export async function logout() {
+  return await axios.post(`${apiurl}/logout`,
+    {
+      withCredentials: true, // Activer les cookies
+    }
+  );
+}
