@@ -5,6 +5,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { PropagateLoader } from 'react-spinners';
+import { GiGasPump } from 'react-icons/gi';
+import { TbManualGearbox } from 'react-icons/tb';
+import { MdDateRange } from 'react-icons/md';
+import { AttachMoney } from '@mui/icons-material';
 
 export default function Favoris() {
   const [favorites, setFavorites] = useState([]);
@@ -46,6 +50,12 @@ export default function Favoris() {
 
   return (
     <div className="p-4 mx-auto max-w-4xl min-h-screen">
+      {/* Titre et description */}
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Vos favoris</h1>
+        <p className="text-gray-600">Retrouvez tous vos véhicules favoris en un seul endroit</p>
+      </div>
+
       {loading ? (
         <div className="flex justify-center items-center h-full py-12">
           <PropagateLoader 
@@ -55,7 +65,7 @@ export default function Favoris() {
           />
         </div>
       ) : (
-        <div className="flex flex-col space-y-4">
+        <div className="space-y-6">
           {favorites.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-xl">Aucun favori trouvé</p>
@@ -64,53 +74,73 @@ export default function Favoris() {
             favorites.map((car, index) => (
               <div
                 key={car._id ? car._id : index}
-                className="flex items-center rounded-xl overflow-hidden shadow-lg border p-4 bg-white cursor-pointer hover:shadow-xl transition-shadow"
-                onClick={() => handleCarClick(car._id)}
+                className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
                 data-aos="fade-up"
               >
-                {/* Image */}
-                <div className="w-1/3 h-32 flex items-center justify-center bg-gray-300">
+                {/* Image en haut */}
+                <div className="w-full h-48 bg-gray-100 rounded-lg overflow-hidden shadow-inner mb-4">
                   {car?.cars_images && car.cars_images.length > 0 ? (
                     <img
                       src={car.cars_images[0]}
                       alt={`${car.marque} ${car.model}`}
-                      className="h-full w-full object-cover"
+                      className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />
                   ) : (
-                    <span className="text-gray-500">Image non disponible</span>
+                    <div className="h-full flex items-center justify-center text-gray-400 bg-gray-50">
+                      Image non disponible
+                    </div>
                   )}
                 </div>
 
-                {/* Informations */}
-                <div className="w-2/3 pl-4">
-                  <h2 className="text-xl font-bold">
-                    {car.marque} {car.model}
-                  </h2>
-                  <p className="text-sm text-gray-500">{car.year}</p>
-                  <div className="flex flex-wrap gap-2 mt-2 text-sm text-gray-700">
-                    <p className="flex items-center gap-1">
-                      <span>🛢️</span> {car.fuelType}
+                {/* Contenu principal */}
+                <div className="flex justify-between items-start">
+                  {/* Informations à gauche */}
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                      {car.marque} {car.model}
+                    </h3>
+                    <p className="text-gray-600 flex items-center gap-1 mb-4">
+                      <MdDateRange fontSize="small" /> {car.year}
                     </p>
-                    <p className="flex items-center gap-1">
-                      <span>⚙️</span> {car.transmission}
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <span>💰</span> {car.price?.toLocaleString('fr-FR')} €
-                    </p>
+
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center px-4 py-2 bg-gray-100 rounded-full text-sm hover:bg-gray-200 transition-colors duration-300">
+                        <span className="mr-2">
+                          <GiGasPump fontSize="small" />
+                        </span>
+                        {car.fuelType}
+                      </div>
+                    
+                      <div className="flex items-center px-4 py-2 bg-gray-100 rounded-full text-sm hover:bg-gray-200 transition-colors duration-300">
+                        <span className="mr-2">
+                          <TbManualGearbox fontSize="small" />
+                        </span>
+                        {car.transmission}
+                      </div>
+                      <div className="flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors duration-300">
+                        <AttachMoney fontSize="small" className="mr-2" />
+                        {car.price?.toLocaleString('fr-FR')} €
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mt-4">
-                    <p className="text-red-600 font-bold text-lg">
-                      {car.price?.toLocaleString('fr-FR')} €
-                    </p>
+
+                  {/* Actions à droite */}
+                  <div className="flex flex-col gap-3 ml-4">
                     <button
-                      className="text-red-500 hover:text-red-700 transition-colors"
+                      className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors duration-300"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteFavori(car._id);
                       }}
                     >
                       <DeleteIcon fontSize="small" />
+                    </button>
+                    <button
+                      onClick={() => handleCarClick(car._id)}
+                      className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 text-sm font-medium shadow-sm"
+                    >
+                      Voir détails
                     </button>
                   </div>
                 </div>
