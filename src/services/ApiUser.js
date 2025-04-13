@@ -48,3 +48,10 @@ export async function logout() {
     }
   );
 }
+
+
+export async function changePassword(data) {
+  return await axios.put(`${apiurl}/changePassword`, data, {
+    withCredentials: true
+  });
+}
