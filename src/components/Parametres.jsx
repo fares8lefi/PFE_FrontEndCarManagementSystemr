@@ -12,7 +12,7 @@ import {
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { PropagateLoader } from "react-spinners";
-import { getUsersbyId ,logout} from "../services/ApiUser";
+import { getUsersbyId ,logout,changePassword} from "../services/ApiUser";
 export default function Parametres() {
   
   const navigate = useNavigate();
@@ -67,32 +67,29 @@ export default function Parametres() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validation des mots de passe
+  
     if (formData.newPassword !== formData.confirmPassword) {
       alert("Les mots de passe ne correspondent pas");
       return;
     }
-
+  
     setFormLoading(true);
     try {
-      // Ici, vous ajouterez l'appel API pour changer le mot de passe
-      // await changePassword(formData);
-
-      // Simulation du chargement
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Réinitialisation du formulaire après succès
+      await changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      });
+  
       setFormData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-
+  
       alert("Mot de passe mis à jour avec succès");
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du mot de passe:", error);
-      alert("Une erreur est survenue lors de la mise à jour du mot de passe");
+      const message = error.response?.data?.message || "Erreur lors de la mise à jour";
+      alert(message);
     } finally {
       setFormLoading(false);
     }
