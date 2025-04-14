@@ -9,6 +9,8 @@ import UsersTable from './components/UsersTable.jsx'
 import CarCards from './components/CarCards.jsx'
 import CarDetaille from './layouts/CarDetaille.jsx'
 import Search from './layouts/search.jsx'
+import Services from './layouts/Services.jsx'
+import Contact from './layouts/Contact.jsx'
 import CarPlusDetaille  from './components/CarPlusDetaille.jsx'
 import CommentCards from './components/CommentCards.jsx'
 import AddCarAnnounecement from './components/AddCarAnnounecement.jsx'
@@ -41,6 +43,8 @@ function App() {
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
         <Route path='/addCarAnnounecement' element={<AddCarAnnounecement/>}></Route>
         <Route path='/userCars' element={<UserCars/>}></Route>
+        <Route path='/services' element={<Services/>}></Route>
+        <Route path='/contact' element={<Contact/>}></Route>
         <Route path='/profilCard' element={<ProfilCard/>}></Route>{/*id from session*/}
         <Route path='/*' element={<Home/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
