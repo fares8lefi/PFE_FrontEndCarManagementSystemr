@@ -64,7 +64,7 @@ export default function ProfileCard() {
         <div className="bg-gray-50 border-t border-gray-200">
           <nav className="flex justify-between">
             {[
-              { id: "informations", label: "Informations" },
+             
               { id: "mes-vehicules", label: "Mes véhicules" },
               { id: "favoris", label: "Favoris" },
               { id: "Parametres", label: "Parametres" },
