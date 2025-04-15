@@ -2,8 +2,10 @@ import React, { useRef, useState } from "react";
 import { addUserClientImgOf } from "../services/ApiUser";
 import Footer from '../components/Footer';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { ToastContainer, toast ,Zoom} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function Singup() {
+export default function Signup() {
   const Password = useRef(null);
   const ConfirmPassword = useRef(null);
 
@@ -14,19 +16,28 @@ export default function Singup() {
     user_image: "",
   });
 
-  const [showPassword, setShowPassword] = useState(false); // Nouvel état pour gérer la visibilité du mot de passe
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Nouvel état pour la confirmation du mot de passe
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const validateEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+  
+  const validatePassword = (password) => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+  };
   const handleChange = (e) => {
     if (e.target.name === "user_image") {
       if (!e.target.files || e.target.files.length === 0) {
-        alert("Veuillez sélectionner une image !");
+        toast.warning("Veuillez sélectionner une image !");
         return;
       }
 
       const file = e.target.files[0];
       if (!file.type.startsWith("image/")) {
-        alert("Seules les images sont autorisées !");
+        toast.error("Seules les images sont autorisées !");
         return;
       }
 
@@ -39,31 +50,57 @@ export default function Singup() {
 
   const AddUserClient = async () => {
     try {
-      if (Password.current?.value !== ConfirmPassword.current?.value) {
-        alert("Les mots de passe doivent être identiques !");
+      const { username, email, password } = newUser;
+  
+      if (!username || !email || !password) {
+        toast.error("Veuillez remplir tous les champs obligatoires");
         return;
       }
-
+  
+      if (!validateEmail(email)) {
+        toast.error("L'adresse e-mail n'est pas valide. Exemple : exemple@domaine.com");
+        return;
+      }
+  
+      if (!validatePassword(password)) {
+        toast.error("Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial, et avoir 8 caractères minimum.");
+        return;
+      }
+  
+      if (Password.current?.value !== ConfirmPassword.current?.value) {
+        toast.error("Les mots de passe doivent être identiques !");
+        return;
+      }
+  
       const formData = new FormData();
       formData.append(
         "user",
         JSON.stringify({
-          username: newUser.username,
-          email: newUser.email,
-          password: newUser.password,
+          username,
+          email,
+          password,
         })
       );
       formData.append("user_image", newUser.user_image);
-
-      await addUserClientImgOf(formData);
-      alert("Enregistrement réussi !");
+  
+      const response = await addUserClientImgOf(formData);
+  
+      if (response.data.success) {
+        toast.success("Enregistrement réussi !");
+        
+      }
     } catch (error) {
       console.error(error);
+      toast.error(
+        error.response?.data?.message ||
+          "Une erreur est survenue lors de l'inscription"
+      );
     }
   };
-
+  
   return (
     <div className="flex flex-col min-h-screen">
+      
       <section className="flex flex-col items-center justify-center flex-1 p-6">
         <div className="border border-gray-300 shadow-2xl shadow-gray-500 p-8 rounded-xl w-full max-w-md bg-white">
           <h3 className="text-2xl font-bold text-center mb-2">Create Your Account</h3>
@@ -83,9 +120,10 @@ export default function Singup() {
             placeholder="Enter Your E-Mail"
             className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
           />
+          
           <div className="relative mb-3">
             <input
-              type={showPassword ? "text" : "password"} // Conditionner l'affichage du mot de passe
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               name="password"
               onChange={handleChange}
@@ -93,24 +131,26 @@ export default function Singup() {
               className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <span
-              onClick={() => setShowPassword(!showPassword)} // Bascule la visibilité du mot de passe
+              onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
             >
-              {showPassword ? <VisibilityOff /> : <Visibility />}
+              {showPassword ?   <Visibility /> :<VisibilityOff />  }
             </span>
           </div>
+
           <div className="relative mb-3">
             <input
-              type={showConfirmPassword ? "text" : "password"} // Conditionner l'affichage du mot de passe de confirmation
+              type={showConfirmPassword ? "text" : "password"}
               ref={ConfirmPassword}
               placeholder="Confirm your Password"
+              onChange={(e) => (ConfirmPassword.current.value = e.target.value)}
               className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <span
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)} // Bascule la visibilité du mot de passe de confirmation
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
             >
-              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+              {showConfirmPassword ? <Visibility /> :<VisibilityOff />}
             </span>
           </div>
 
@@ -123,21 +163,26 @@ export default function Singup() {
             className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
           />
 
-          <div className="flex justify-between items-center mb-4 text-sm">
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              Remember Me
-            </label>
-          </div>
-
           <button
-            className="bg-black w-full rounded-3xl py-3 text-white text-center font-semibold"
+            className="bg-black w-full rounded-3xl py-3 text-white text-center font-semibold hover:bg-gray-800 transition-colors"
             onClick={AddUserClient}
             type="button"
           >
             Sign Up
           </button>
         </div>
+        <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       </section>
       <Footer />
     </div>

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GoogleIcon from "@mui/icons-material/Google";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { ToastContainer, toast, Zoom } from "react-toastify";
+import { ToastContainer, toast, } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 export default function Login() {
   const navigate = useNavigate();
@@ -128,15 +128,17 @@ export default function Login() {
             </button>
           </p>
           <ToastContainer
-            toastClassName={() =>
-              "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] bg-gray-800 text-white rounded-xl px-6 py-4 shadow-lg text-sm"
-            }
-            bodyClassName="text-center"
-            closeButton={false}
-            autoClose={3000}
-            hideProgressBar
-            transition={Zoom}
-          />
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
         </div>
       </section>
       <Footer />
