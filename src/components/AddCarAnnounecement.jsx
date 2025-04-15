@@ -1,6 +1,8 @@
 import { React, useState } from "react";
 import { addCarImages } from "../services/ApiCar";
 import Navbar from "./Navbar";
+import { ToastContainer, toast} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function AddCarAnnounecement() {
   const [carData, setCarData] = useState({
     marque: "",
@@ -54,13 +56,13 @@ export default function AddCarAnnounecement() {
       const response = await addCarImages(submitCarData);
 
       if (response.data) {
-        alert("Annonce publiée!");
+         toast.success("Annonce publiée!");
         setQrCode(response.data.qrCode);
         setIsModalOpen(true);
       }
     } catch (error) {
       console.error(error);
-      alert("Erreur de publié de l'annonce.");
+       toast.error("Erreur de publié de l'annonce.");
     }
   };
   const closeModal = () => {
@@ -196,6 +198,18 @@ export default function AddCarAnnounecement() {
           >
             Publier l'annonce
           </button>
+          <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="colored"
+                />
         </div>
       </form>
       {/*boite de dialogue est affichage de qr code */}
