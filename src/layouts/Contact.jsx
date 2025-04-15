@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
-
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 const Contact = () => {
   const [formData, setFormData] = useState({
     nom: '',
@@ -26,7 +27,9 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100"
+    data-aos="fade-up"
+    >
       {/* Hero Section avec animation de fond */}
       <div className="relative bg-sky-900 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 bg-black/10 pattern-dots"></div>

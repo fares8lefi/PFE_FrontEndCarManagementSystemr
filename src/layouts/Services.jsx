@@ -1,11 +1,15 @@
 import React from 'react';
 import { FaCar, FaTools, FaHandshake, FaShieldAlt, FaClock, FaMoneyBillWave } from 'react-icons/fa';
-
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 const Services = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white"
+    data-aos="fade-up"
+    >
+      <div className='bg-gray-50  h-1'></div>
       {/* Hero Section */}
-      <div className="bg-blue-700 text-white py-20">
+      <div className="bg-white text-black py-20">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">
             Nos Services Premium
