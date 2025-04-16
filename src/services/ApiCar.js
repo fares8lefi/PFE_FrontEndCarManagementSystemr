@@ -41,3 +41,42 @@ export const getCarsByMarque = (marque) =>
 
 export const getCarsFiltered = (filters = {}) =>
   axios.get(`${apiurl}/getCarsFiltered`, { params: filters });
+
+
+
+export const getCarStats = () => {
+  return axios.get(`${apiurl}/getCarStats`,{
+    withCredentials: true,
+  });
+};
+
+export const getLatestCars = () => {
+  return axios.get(`${apiurl}/getLatestCars`,{
+    withCredentials: true,
+  });
+};
+
+
+export const getMonthlySalesStats = () => {
+  return axios.get(`${apiurl}/getMonthlySalesStats`,{
+    withCredentials: true,
+  });
+};
+
+export const getPriceStatsByBrand = () => {
+  return axios.get(`${apiurl}/getPriceStatsByBrand`,{
+    withCredentials: true,
+  });
+};
+
+export const getDailyViewsStats = () => {
+  return axios.get(`${apiurl}/getDailyViewsStats`,{
+    withCredentials: true,
+  });
+};
+
+export const getCarsByYear = () => {
+  return axios.get(`${apiurl}/getCarsByYear`,{
+    withCredentials: true,
+  });
+};
