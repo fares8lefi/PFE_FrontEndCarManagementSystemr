@@ -75,8 +75,8 @@ export const getDailyViewsStats = () => {
   });
 };
 
-export const getCarsByYear = () => {
-  return axios.get(`${apiurl}/getCarsByYear`,{
+export const getDailyCarAdditions = () => {
+  return axios.get(`${apiurl}/getDailyCarAdditions`,{
     withCredentials: true,
   });
 };
