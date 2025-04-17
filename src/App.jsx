@@ -22,6 +22,7 @@ import SideBar from './components/FilterSidebar.jsx'
 import Parametres from './components/Parametres'
 import HomeAdmin from './Admin/HomeAdmin.jsx'
 import DashboardAdmin from './Admin/AdminComponent/DashboardAdmin.jsx'
+import SideBarAdmin from './Admin/AdminComponent/SideBarAdmin.jsx'
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
       <Routes>
       <Route path="/homeAdmin" element={<HomeAdmin />} />
       <Route path="/dashboardAdmin" element={<DashboardAdmin />} />
+      <Route path="/sideBarAdmin" element={<SideBarAdmin />} />
         <Route path="/Navbar" element={<Navbar />} />
         <Route path="/Footer" element={<Footer />} />
         <Route path="/login" element={<Login />} />
