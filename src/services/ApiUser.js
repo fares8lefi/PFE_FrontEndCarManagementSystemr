@@ -3,9 +3,17 @@ import axios from "axios";
 const apiurl = "http://localhost:3000/users";
 
 export async function getAllUsers() {
-  return await axios.get(`${apiurl}/getAllUsers`);
+  return await axios.get(`${apiurl}/getAllUsers`,)
+ 
 }
-
+export async function searchUsers(query) {
+  return await axios.get(`${apiurl}/users/search`, {
+    params: { q: query }
+  });
+}
+export const updateUserStatus = (userId, status) => {
+  return axios.patch(`${apiurl}/updateUserStatus/${userId}/status`, { status });
+};
 export async function addUserClientImgOf(formData) {
   return await axios.post(
     `${apiurl}/addUserClientImgOf`, // Utilisez le chemin relatif
