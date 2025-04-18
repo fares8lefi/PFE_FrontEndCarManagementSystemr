@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { PropagateLoader } from 'react-spinners';
-import { getAllUsers, searchUsers, updateUserStatus } from '../../services/ApiUser';
+import { getAllUsers, searchUsers, updateUserStatus, deleteUser } from '../../services/ApiUser';
 import { debounce } from './debounce';
 
 const UsersManagement = () => {
@@ -20,6 +20,7 @@ const UsersManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const [editForm, setEditForm] = useState({
     _id: '',
     username: '',
@@ -55,7 +56,7 @@ const UsersManagement = () => {
   const handleStatusToggle = async (userId, currentStatus) => {
     setUpdatingId(userId);
     try {
-      const newStatus = currentStatus === 'Active' ? 'blocked' : 'Active';
+      const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
       await updateUserStatus(userId, newStatus);
       await fetchUsers(searchTerm);
       toast.success(`Statut utilisateur mis à jour : ${newStatus === 'blocked' ? 'Bloqué' : 'Actif'}`);
@@ -63,6 +64,21 @@ const UsersManagement = () => {
       toast.error(error.response?.data?.message || "Échec de la modification du statut");
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleDelete = async (userId) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+      setDeletingId(userId);
+      try {
+        await deleteUser(userId);
+        await fetchUsers(searchTerm);
+        toast.success("Utilisateur supprimé avec succès");
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Échec de la suppression");
+      } finally {
+        setDeletingId(null);
+      }
     }
   };
 
@@ -185,10 +201,18 @@ const UsersManagement = () => {
                             )}
                           </button>
                           <button
-                            className="text-gray-600 hover:text-gray-800 transition-colors"
+                            onClick={() => handleDelete(user._id)}
+                            disabled={deletingId === user._id}
+                            className={`text-red-600 hover:text-red-800 transition-colors ${
+                              deletingId === user._id ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                             title="Supprimer"
                           >
-                            <FaTrash className="text-lg" />
+                            {deletingId === user._id ? (
+                              <FaSpinner className="animate-spin text-lg" />
+                            ) : (
+                              <FaTrash className="text-lg" />
+                            )}
                           </button>
                         </div>
                       </td>
