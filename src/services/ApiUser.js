@@ -7,12 +7,15 @@ export async function getAllUsers() {
  
 }
 export async function searchUsers(query) {
-  return await axios.get(`${apiurl}/users/search`, {
+  return await axios.get(`${apiurl}/searchUsers`, {
     params: { q: query }
   });
 }
 export const updateUserStatus = (userId, status) => {
   return axios.patch(`${apiurl}/updateUserStatus/${userId}/status`, { status });
+};
+export const deleteUser = (userId) => {
+  return axios.delete(`${apiurl}/deleteUser/${userId}`);
 };
 export async function addUserClientImgOf(formData) {
   return await axios.post(
