@@ -26,12 +26,14 @@ export default function Login() {
       if (response.data?.success) {
         localStorage.setItem("authToken", response.data.token);
         const userRole = response.data.user.role;
-
+        const userStatus=response.data.user.status;
+       if(userStatus==="Active"){
         if (userRole === "admin") {
           navigate("/usersTable");
         } else {
           navigate("/home");
         }
+       }
       } else {
         toast.error(response.data?.message || "Authentification échouée");
       }
