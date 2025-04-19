@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaBars, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
 import DashboardAdmin from '../AdminComponent/DashboardAdmin';
-
+import UsersManagement from '../AdminComponent/UsersManagement'
 // Composant Navbar
 const Navbar = ({ toggleSidebar }) => (
   <nav className="sticky top-0 z-40 bg-white shadow-md">
@@ -44,7 +44,7 @@ const AdminLayout = () => {
             {[
               { key: 'dashboard', label: 'Tableau de bord' },
               { key: 'cars', label: 'Gestion des voitures' },
-              { key: 'users', label: 'Utilisateurs' },
+              { key: 'UsersManagement', label: 'Utilisateurs' },
               { key: 'announcements', label: 'Annonces' },
               { key: 'notifications', label: 'Notifications' },
             ].map((item) => (
@@ -77,12 +77,7 @@ const AdminLayout = () => {
               <p className="mt-2 text-gray-600">Contenu de la gestion des voitures à venir.</p>
             </div>
           )}
-          {activeMenu === 'users' && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-2xl font-semibold text-gray-800">Gestion des utilisateurs</h2>
-              <p className="mt-2 text-gray-600">Contenu de la gestion des utilisateurs à venir.</p>
-            </div>
-          )}
+          {activeMenu === 'UsersManagement' &&  <UsersManagement/>}
           {activeMenu === 'announcements' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-2xl font-semibold text-gray-800">Gestion des annonces</h2>
