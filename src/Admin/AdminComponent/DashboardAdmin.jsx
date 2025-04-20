@@ -80,7 +80,6 @@ const LatestCarsTable = ({ cars, tableHeaderStyle, tableCellStyle }) => (
               </td>
               <td className={tableCellStyle}>
                 <div className="flex items-center">
-                  <span className="mr-2">👤</span>
                   {car.userID?.username || 'Anonyme'}
                 </div>
               </td>

@@ -10,6 +10,7 @@ export async function getCarById(id) {
   return await axios.get(`${apiurl}/getCarById/${id}`);
 }
 
+
 export const addCarImages = (submitCarData) => {
   return axios.post(`${apiurl}/addCarImages`, submitCarData, {
     withCredentials: true, //activations des cokkies

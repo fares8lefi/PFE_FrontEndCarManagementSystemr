@@ -11,6 +11,7 @@ export async function searchUsers(query) {
     params: { q: query }
   });
 }
+
 export const updateUserStatus = (userId, status) => {
   return axios.patch(`${apiurl}/updateUserStatus/${userId}/status`, { status });
 };
