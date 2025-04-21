@@ -126,7 +126,7 @@ const UsersManagement = () => {
   }
 
   return (
-    <div className="mr-4 p-6 bg-gray-50 min-h-screen">
+    <div className="mr-4 p-6 bg-gray-50  mt-10 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-gray-800">Gestion des Utilisateurs</h1>
