@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { FaBars, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
 import DashboardAdmin from '../AdminComponent/DashboardAdmin';
-import UsersManagement from '../AdminComponent/UsersManagement'
+import UsersManagement from '../AdminComponent/UsersManagement';
+import CarMangement from '../AdminComponent/CarManagement';
+
 // Composant Navbar
 const Navbar = ({ toggleSidebar }) => (
   <nav className="sticky top-0 z-40 bg-white shadow-md">
@@ -27,7 +29,6 @@ const Navbar = ({ toggleSidebar }) => (
   </nav>
 );
 
-// Composant principal AdminLayout avec Sidebar intégrée
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
@@ -36,14 +37,14 @@ const AdminLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar intégrée directement */}
+      {/* Sidebar */}
       <aside className={`fixed h-full bg-white shadow-lg w-64 transition-transform z-50 
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         <div className="p-6">
           <nav className="space-y-2">
-            {[
+            {[ 
               { key: 'dashboard', label: 'Tableau de bord' },
-              { key: 'cars', label: 'Gestion des voitures' },
+              { key: 'CarMangement', label: 'Gestion des voitures' },
               { key: 'UsersManagement', label: 'Utilisateurs' },
               { key: 'announcements', label: 'Annonces' },
               { key: 'notifications', label: 'Notifications' },
@@ -62,22 +63,13 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Contenu principal */}
-      <div
-        className={`flex-1 transition-all duration-300 ${
-          isSidebarOpen ? 'lg:ml-64' : 'lg:ml-0'
-        }`}
-      >
+      {/* Main content */}
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-0'}`}>
         <Navbar toggleSidebar={toggleSidebar} />
-        <main className="p-6 max-w-7xl mx-auto">
+        <main className="p-6 max-w-7xl mx-auto mt-6">
           {activeMenu === 'dashboard' && <DashboardAdmin />}
-          {activeMenu === 'cars' && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-2xl font-semibold text-gray-800">Gestion des voitures</h2>
-              <p className="mt-2 text-gray-600">Contenu de la gestion des voitures à venir.</p>
-            </div>
-          )}
-          {activeMenu === 'UsersManagement' &&  <UsersManagement/>}
+          {activeMenu === 'CarMangement' && <CarMangement />}
+          {activeMenu === 'UsersManagement' && <UsersManagement />}
           {activeMenu === 'announcements' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-2xl font-semibold text-gray-800">Gestion des annonces</h2>
