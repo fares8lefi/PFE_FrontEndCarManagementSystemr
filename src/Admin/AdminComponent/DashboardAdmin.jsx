@@ -192,7 +192,7 @@ const DashboardAdmin = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
+    <div className="ml-64 mr-4 max-w-7xl mx-auto  space-y-8">
       {/* Section des cartes de statistiques */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
