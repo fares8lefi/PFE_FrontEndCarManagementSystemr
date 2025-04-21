@@ -32,10 +32,9 @@ const UsersManagement = () => {
   const fetchUsers = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const response = searchQuery 
+      const response = searchQuery
         ? await searchUsers(searchQuery)
         : await getAllUsers();
-
       setUsers(response.data || []);
     } catch (error) {
       toast.error(error.response?.data?.message || "Erreur de chargement des utilisateurs");
@@ -68,17 +67,16 @@ const UsersManagement = () => {
   };
 
   const handleDelete = async (userId) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-      setDeletingId(userId);
-      try {
-        await deleteUser(userId);
-        await fetchUsers(searchTerm);
-        toast.success("Utilisateur supprimé avec succès");
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Échec de la suppression");
-      } finally {
-        setDeletingId(null);
-      }
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) return;
+    setDeletingId(userId);
+    try {
+      await deleteUser(userId);
+      await fetchUsers(searchTerm);
+      toast.success("Utilisateur supprimé avec succès");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Échec de la suppression");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -101,14 +99,14 @@ const UsersManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="ml-64 mr-4 flex justify-center items-center h-screen">
         <PropagateLoader color="#3B82F6" size={15} />
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="ml-64 mr-4 p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-gray-800">Gestion des Utilisateurs</h1>
@@ -140,7 +138,6 @@ const UsersManagement = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
-              
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.length > 0 ? (
                   users.map((user) => (
@@ -157,62 +154,24 @@ const UsersManagement = () => {
                       </td>
                       <td className="px-6 py-4 text-gray-600">{user.email}</td>
                       <td className="px-6 py-4">
-                        <span className="px-2 py-1 bg-gray-100 rounded text-sm capitalize">
-                          {user.role}
-                        </span>
+                        <span className="px-2 py-1 bg-gray-100 rounded text-sm capitale">{user.role}</span>
                       </td>
-                      <td className="px-6 py-4 text-gray-500">
-                        {new Date(user.createdAt).toLocaleDateString('fr-FR')}
-                      </td>
+                      <td className="px-6 py-4 text-gray-500">{new Date(user.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          user.status === 'blocked' 
-                            ? 'bg-red-100 text-red-800' 
+                          user.status === 'blocked'
+                            ? 'bg-red-100 text-red-800'
                             : 'bg-green-100 text-green-800'
-                        }`}>
-                          {user.status === 'blocked' ? 'Bloqué' : 'Actif'}
-                        </span>
+                        }`}> {user.status === 'blocked' ? 'Bloqué' : 'Actif'} </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex space-x-3">
-                          <button
-                            onClick={() => handleEditClick(user)}
-                            className="text-blue-600 hover:text-blue-800 transition-colors"
-                            title="Modifier"
-                          >
-                            <FaUserEdit className="text-lg" />
+                          <button onClick={() => handleEditClick(user)} className="text-blue-600 hover:text-blue-800"><FaUserEdit /></button>
+                          <button onClick={() => handleStatusToggle(user._id, user.status)} disabled={updatingId === user._id} className={`${user.status === 'blocked' ? 'text-green-600 hover:text-green-800' : 'text-red-600 hover:text-red-800'} ${updatingId === user._id ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            {updatingId === user._id ? <FaSpinner className="animate-spin text-lg" /> : user.status === 'blocked' ? <FaUnlock className="text-lg" /> : <FaLock className="text-lg" />}
                           </button>
-                          <button
-                            onClick={() => handleStatusToggle(user._id, user.status)}
-                            disabled={updatingId === user._id}
-                            className={`${
-                              user.status === 'blocked' 
-                                ? 'text-green-600 hover:text-green-800' 
-                                : 'text-red-600 hover:text-red-800'
-                            } ${updatingId === user._id ? 'opacity-50 cursor-not-allowed' : ''} transition-colors`}
-                            title={user.status === 'blocked' ? 'Débloquer' : 'Bloquer'}
-                          >
-                            {updatingId === user._id ? (
-                              <FaSpinner className="animate-spin text-lg" />
-                            ) : user.status === 'blocked' ? (
-                              <FaUnlock className="text-lg" />
-                            ) : (
-                              <FaLock className="text-lg" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user._id)}
-                            disabled={deletingId === user._id}
-                            className={`text-red-600 hover:text-red-800 transition-colors ${
-                              deletingId === user._id ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                            title="Supprimer"
-                          >
-                            {deletingId === user._id ? (
-                              <FaSpinner className="animate-spin text-lg" />
-                            ) : (
-                              <FaTrash className="text-lg" />
-                            )}
+                          <button onClick={() => handleDelete(user._id)} disabled={deletingId === user._id} className={`text-red-600 hover:text-red-800 ${deletingId === user._id ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            {deletingId === user._id ? <FaSpinner className="animate-spin text-lg" /> : <FaTrash className="text-lg" />}
                           </button>
                         </div>
                       </td>
@@ -220,9 +179,7 @@ const UsersManagement = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                      Aucun utilisateur trouvé
-                    </td>
+                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">Aucun utilisateur trouvé</td>
                   </tr>
                 )}
               </tbody>
@@ -234,74 +191,34 @@ const UsersManagement = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-xl font-semibold mb-4">Modifier l'utilisateur</h2>
-              <form onSubmit={handleSave}>
-                <div className="space-y-4">
+              <form onSubmit={handleSave} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nom d'utilisateur</label>
+                  <input required value={editForm.username} onChange={e => setEditForm({ ...editForm, username: e.target.value })} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email"	required value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nom d'utilisateur
-                    </label>
-                    <input
-                      required
-                      value={editForm.username}
-                      onChange={(e) => setEditForm({...editForm, username: e.target.value})}
-                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+                    <select value={editForm.role} onChange={e => setEditForm({ ...editForm, role: e.target.value })} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                      <option value="user">Utilisateur</option>
+                      <option value="admin">Administrateur</option>
+                    </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={editForm.email}
-                      onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Rôle
-                      </label>
-                      <select
-                        value={editForm.role}
-                        onChange={(e) => setEditForm({...editForm, role: e.target.value})}
-                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="user">Utilisateur</option>
-                        <option value="admin">Administrateur</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Statut
-                      </label>
-                      <select
-                        value={editForm.status}
-                        onChange={(e) => setEditForm({...editForm, status: e.target.value})}
-                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="active">Actif</option>
-                        <option value="blocked">Bloqué</option>
-                      </select>
-                    </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <select value={editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500">
+                      <option value="active">Actif</option>
+                      <option value="blocked">Bloqué</option>
+                    </select>
                   </div>
                 </div>
                 <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowEditModal(false)}
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                  >
-                    Sauvegarder
-                  </button>
+                  <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors">Annuler</button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Sauvegarder</button>
                 </div>
               </form>
             </div>
