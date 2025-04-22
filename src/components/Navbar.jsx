@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { getUsersbyId } from "../services/ApiUser";
 import { getUserNotifications, markAsRead } from "../services/ApiNotifiations";
@@ -17,6 +17,7 @@ function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [hasViewedNotifications, setHasViewedNotifications] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const isLoggedIn = localStorage.getItem("authToken");
   const dropdownRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -100,16 +101,41 @@ function Navbar() {
   const handleLogin = () => navigate("/login");
   const handleProfile = () => navigate("/profil");
 
-  const NavigationLink = ({ to, children }) => (
-    <li>
-      <Link
-        to={to}
-        className="hover:text-blue-400 transition-colors duration-200"
-      >
-        {children}
-      </Link>
-    </li>
-  );
+  const NavigationLink = ({ to, children }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const handleClick = (e) => {
+      e.preventDefault();
+      if (to === '/') {
+        navigate('/');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const sectionId = to.replace('/', '');
+        if (location.pathname !== '/') {
+          navigate('/', { state: { scrollTo: sectionId } });
+        } else {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }
+    };
+
+    return (
+      <li>
+        <a
+          href={to}
+          onClick={handleClick}
+          className="hover:text-blue-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-sky-800"
+        >
+          {children}
+        </a>
+      </li>
+    );
+  };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -144,10 +170,10 @@ function Navbar() {
 
         <div className="flex-grow flex justify-center">
           <ul className="flex gap-6 text-sm font-medium">
-            <NavigationLink to="/">Home</NavigationLink>
-            <NavigationLink to="/about-us">About Us</NavigationLink>
-            <NavigationLink to="/services">Services</NavigationLink>
-            <NavigationLink to="/contact">Contact</NavigationLink>
+            <NavigationLink to="/">Accueil</NavigationLink>
+            <NavigationLink to="about-us">À Propos</NavigationLink>
+            <NavigationLink to="services">Services</NavigationLink>
+            <NavigationLink to="contact">Contact</NavigationLink>
           </ul>
         </div>
 
@@ -156,19 +182,6 @@ function Navbar() {
             <div className="flex items-center justify-center"></div>
           ) : isLoggedIn ? (
             <>
-              <div className="relative w-full max-w-md min-w-[200px]">
-                <form onSubmit={handleSearchSubmit}>
-                  <input
-                    type="text"
-                    placeholder="Rechercher par marque..."
-                    className="w-full pl-3 pr-10 py-2 rounded-full bg-white/10 text-sm placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all duration-300"
-                    aria-label="Barre de recherche"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </form>
-              </div>
-
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={handleNotificationClick}
