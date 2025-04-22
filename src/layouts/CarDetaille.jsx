@@ -3,20 +3,30 @@ import { useParams } from "react-router-dom";
 import { getCarById } from "../services/ApiCar";
 import CarPlusDetaille from "../components/CarPlusDetaille";
 import CommentCards from "../components/CommentCards";
-import { MdDateRange, MdOutlinePending } from "react-icons/md";
+import { MdDateRange, MdOutlinePending, MdLocalGasStation, MdSpeed } from "react-icons/md";
+import { GiGearStickPattern, GiCarDoor, GiCarKey } from "react-icons/gi";
+import { PropagateLoader } from 'react-spinners';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export default function CarDetaille() {
   const { id } = useParams();
   const [car, setCar] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const CarDetails = async () => {
     try {
+      setLoading(true);
       const response = await getCarById(id);
-      setCar(response.data || null);
+      if (response.data) {
+        const carData = response.data;
+        setCar(carData);
+      }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -24,98 +34,230 @@ export default function CarDetaille() {
     if (id) CarDetails();
   }, [id]);
 
+  const nextImage = () => {
+    setSelectedIndex((prev) => 
+      prev === car.cars_images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevImage = () => {
+    setSelectedIndex((prev) => 
+      prev === 0 ? car.cars_images.length - 1 : prev - 1
+    );
+  };
+
+  const convertBufferToUrl = (imageData) => {
+    if (!imageData) return '';
+    
+    if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
+      return imageData;
+    }
+    
+    try {
+      return `data:image/jpeg;base64,${imageData}`;
+    } catch (error) {
+      console.error('Erreur de conversion d\'image:', error);
+      return '';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <PropagateLoader color="#3B82F6" />
+          <p className="mt-4 text-gray-600">Chargement des détails...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!car) {
     return (
-      <div className="w-full min-h-screen bg-gray-50 p-8">
-        <div className="w-full bg-white shadow-xl rounded-2xl p-8">
-          <div className="text-center text-xl text-gray-500">Chargement...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center text-gray-600">
+          <h2 className="text-2xl font-bold mb-2">Véhicule non trouvé</h2>
+          <p>Les détails de ce véhicule ne sont pas disponibles.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 p-8">
-      <div className="w-full bg-white shadow-xl rounded-2xl p-8">
-        {/* --- Image principale --- */}
-        <div className="mb-8">
-          <div className="relative w-full h-96 flex items-center justify-center bg-gray-200 rounded-xl overflow-hidden">
-            <img
-              src={car.cars_images[selectedIndex]} // On affiche l'image sélectionnée
-              alt={`Car ${selectedIndex + 1}`}
-              className="object-contain h-full w-auto cursor-pointer"
-              onClick={() => setIsOpen(true)} // Ouvre la modale au clic
-            />
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Section Image Gallery */}
+          <div className="relative">
+            {/* Image principale */}
+            <div className="relative h-[60vh] bg-gray-100">
+              {car.cars_images ? (
+                <>
+                  <img
+                    src={car.cars_images}
+                    alt={`${car.marque} ${car.model}`}
+                    className="w-full h-full object-contain cursor-zoom-in transition-opacity duration-300"
+                    onClick={() => setIsOpen(true)}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/default-car.png';
+                    }}
+                  />
+                  {Array.isArray(car.cars_images) && car.cars_images.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {selectedIndex + 1} / {car.cars_images.length}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100">
+                  <GiCarKey className="text-6xl text-gray-400 mb-2" />
+                  <span className="text-gray-500">Aucune image disponible</span>
+                </div>
+              )}
+            </div>
+
+            {/* Miniatures (si plusieurs images) */}
+            {Array.isArray(car.cars_images) && car.cars_images.length > 1 && (
+              <div className="relative mt-4 px-4">
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                  {car.cars_images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedIndex(index)}
+                      className={`flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 transition-all ${
+                        selectedIndex === index 
+                          ? 'border-blue-600 shadow-lg scale-105' 
+                          : 'border-transparent hover:border-blue-400'
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`Miniature ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/default-car.png';
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="flex space-x-4 mt-4 overflow-x-auto pb-4 whitespace-nowrap scrollbar-hide">
-            {car.cars_images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Thumbnail ${index + 1}`}
-                className={`w-24 h-24 object-cover rounded-lg cursor-pointer transition-transform duration-300 ${
-                  index === selectedIndex
-                    ? "scale-105 border-2 border-blue-500"
-                    : ""
-                }`}
-                onClick={() => setSelectedIndex(index)} // Met à jour l'image principale
-              />
-            ))}
+          {/* Informations principales */}
+          <div className="px-6 py-8">
+            <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                  {car.marque} {car.model}
+                </h1>
+                <div className="flex flex-wrap gap-3">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    {car.year}
+                  </span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    {car.statut}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-3xl font-bold text-blue-600">{car.prix} TND</span>
+                <span className="text-sm text-gray-500">Prix négociable</span>
+              </div>
+            </div>
+
+            {/* Caractéristiques */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8">
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <MdLocalGasStation className="text-2xl text-blue-600" />
+                  <div>
+                    <p className="text-sm text-gray-500">Carburant</p>
+                    <p className="font-medium">{car.carburant}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <GiGearStickPattern className="text-2xl text-blue-600" />
+                  <div>
+                    <p className="text-sm text-gray-500">Boîte</p>
+                    <p className="font-medium">{car.boite}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <MdSpeed className="text-2xl text-blue-600" />
+                  <div>
+                    <p className="text-sm text-gray-500">Kilométrage</p>
+                    <p className="font-medium">{car.kilometrage} km</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <GiCarDoor className="text-2xl text-blue-600" />
+                  <div>
+                    <p className="text-sm text-gray-500">Nombre de portes</p>
+                    <p className="font-medium">{car.portes || '4'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <h3 className="text-2xl font-semibold mb-4">Description</h3>
+              <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                {car.description}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* --- Modale d’agrandissement --- */}
+        {/* Modal pour l'image en plein écran */}
         {isOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-            <div className="relative">
+          <div 
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
+            onClick={() => setIsOpen(false)}
+          >
+            <div className="relative max-w-[90vw] max-h-[90vh]">
               <img
-                src={car.cars_images[selectedIndex]}
-                alt={`Full screen Car ${selectedIndex + 1}`}
-                className="max-w-[90vw] max-h-[90vh] object-contain"
+                src={car.cars_images}
+                alt={`${car.marque} ${car.model}`}
+                className="max-w-full max-h-[90vh] object-contain"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/default-car.png';
+                }}
               />
               <button
-                onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 text-white text-3xl font-bold"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(false);
+                }}
+                className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/75 rounded-full p-2 transition-all"
               >
-                &times;
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
           </div>
         )}
 
-        {/* Détails de la voiture */}
-        <div className="px-8 pb-8 space-y-6">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-            <h1 className="text-4xl font-bold text-gray-900">
-              {car.marque} {car.model}
-            </h1>
-            <p className="text-3xl font-bold text-blue-600">{car.price} €</p>
-          </div>
-
-          <div className="flex flex-wrap gap-4 text-xl text-gray-600">
-            <div className="flex items-center bg-gray-100 px-4 py-2 rounded-full gap-2">
-              <MdDateRange className="h-6 w-6 text-blue-600" />
-              <span>{car.year}</span>
-            </div>
-
-            <div className="flex items-center bg-green-100 px-4 py-2 rounded-full gap-2 text-green-800">
-              <MdOutlinePending className="h-6 w-6 text-green-600" />
-              <span>{car.statut}</span>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <h3 className="text-2xl font-semibold mb-4">Description</h3>
-            <p className="text-gray-700 text-lg leading-relaxed">
-              {car.description}
-            </p>
-          </div>
+        {/* Sections supplémentaires */}
+        <div className="mt-8">
+          <CarPlusDetaille />
+        </div>
+        <div className="mt-8">
+          <CommentCards carId={id} />
         </div>
       </div>
-
-      <CarPlusDetaille />
-      <CommentCards carId={id} />
     </div>
   );
 }

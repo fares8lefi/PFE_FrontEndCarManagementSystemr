@@ -4,30 +4,41 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaUserCircle, FaClock, FaPaperPlane } from 'react-icons/fa';
+
 export default function CommentCards({ carId }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setNewComment(e.target.value);
+    if (error) setError("");
   };
 
-  // envoie le commentaire
   const submitComment = async (e) => {
     e.preventDefault();
+    if (!newComment.trim()) return;
+
+    setIsSubmitting(true);
     try {
       await addComment(carId, newComment);
       setNewComment("");
       setError("");
-      toast.success("commentaire ajouté avec succée");
+      toast.success("Commentaire ajouté avec succès", {
+        position: "bottom-right",
+        theme: "colored"
+      });
       await getComments();
     } catch (error) {
+      toast.error(error.response?.data?.message || "Erreur lors de l'ajout du commentaire");
       setError(error.response?.data?.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // récupérer les commentaires
   const getComments = async () => {
     try {
       const response = await getCommentsByCar(carId);
@@ -37,22 +48,16 @@ export default function CommentCards({ carId }) {
       setComments([]);
     }
   };
+
   useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    });
-  }, []);
+    AOS.init({ duration: 1000, once: true });
+    if (carId) getComments();
+  }, [carId]);
+
   useEffect(() => {
     AOS.refresh();
   }, [comments]);
 
-  useEffect(() => {
-    if (carId) {
-      getComments();
-    }
-  }, [carId]);
-  // format data
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("fr-FR", {
       day: "numeric",
@@ -62,75 +67,95 @@ export default function CommentCards({ carId }) {
       minute: "2-digit",
     });
   };
+
   return (
-    <div data-aos="fade-up">
-      <div className="space-y-4 mt-6 p-8">
-        <div data-aos="fade-up">
-          <form onSubmit={submitComment} className="flex gap-4 items-center">
-            <input
-              type="text"
-              placeholder="Entrez votre commentaire"
+    <div className="bg-white rounded-xl shadow-lg p-6 mt-8" data-aos="fade-up">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+        Commentaires
+        <span className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+          {comments.length}
+        </span>
+      </h2>
+
+      {/* Formulaire de commentaire */}
+      <div className="mb-8">
+        <form onSubmit={submitComment} className="space-y-4">
+          <div className="relative">
+            <textarea
+              placeholder="Partagez votre avis..."
               value={newComment}
               onChange={handleChange}
-              className="flex-1 bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-4 py-3 rounded-lg border ${
+                error ? 'border-red-500' : 'border-gray-200'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none h-24`}
               required
             />
+            {error && (
+              <p className="text-red-500 text-sm mt-1">{error}</p>
+            )}
+          </div>
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="w-24 h-12 bg-amber-400 rounded-3xl text-white hover:bg-amber-500 transition-colors"
+              disabled={isSubmitting || !newComment.trim()}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-white transition-all ${
+                isSubmitting || !newComment.trim()
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
-              Ajouter
+              <FaPaperPlane />
+              {isSubmitting ? 'Envoi...' : 'Commenter'}
             </button>
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="colored"
-            />
-          </form>
-        </div>
-        {error && <div className="text-red-500 text-center mt-2">{error}</div>}
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Commentaires ({comments.length})
-        </h2>
+          </div>
+        </form>
+      </div>
+
+      {/* Liste des commentaires */}
+      <div className="space-y-6">
         {comments.length === 0 ? (
-          <div className="text-center mt-4 text-gray-500">
-            Aucun commentaire pour cette voiture
+          <div className="text-center py-8 text-gray-500">
+            <p className="text-lg">Aucun commentaire pour le moment</p>
+            <p className="text-sm mt-2">Soyez le premier à donner votre avis !</p>
           </div>
         ) : (
           comments.map((comment) => (
             <div
               key={comment._id}
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+              data-aos="fade-up"
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center">
-                  {comment.userId.user_image && (
-                    <img
-                      src={comment.userId.user_image}
-                      alt={`${comment.userId.username}'s avatar`}
-                      className="h-10 w-10 rounded-full object-cover mr-2"
-                    />
-                  )}
-                  <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                    {comment.userId.username}
-                  </span>
-                  <span className="ml-4 text-sm text-gray-500">
-                    {formatDate(comment.createdAt)}
-                  </span>
+              <div className="flex items-start gap-4">
+                {comment.userId.user_image ? (
+                  <img
+                    src={comment.userId.user_image}
+                    alt={comment.userId.username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUserCircle className="w-10 h-10 text-gray-400" />
+                )}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-semibold text-gray-900">
+                      {comment.userId.username}
+                    </span>
+                    <span className="text-sm text-gray-500 flex items-center gap-1">
+                      <FaClock className="w-3 h-3" />
+                      {formatDate(comment.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 leading-relaxed">
+                    {comment.content}
+                  </p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">{comment.content}</p>
             </div>
           ))
         )}
       </div>
+
+      <ToastContainer position="bottom-right" />
     </div>
   );
 }

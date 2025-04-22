@@ -1,229 +1,229 @@
 import React, { useState } from "react";
 import { GiCarKey, GiGasPump, GiGearStick } from "react-icons/gi";
+import { MdSpeed, MdDateRange, MdOutlineElectricalServices } from "react-icons/md";
+import { FaEuroSign, FaFilter, FaUndo } from "react-icons/fa";
 
 const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [yearRange, setYearRange] = useState([1970, new Date().getFullYear()]);
-  const [mileage, setMileage] = useState(300000);
-  const [selectedEnergy, setSelectedEnergy] = useState("");
-  const [selectedTransmission, setSelectedTransmission] = useState("");
+  const [kmRange, setKmRange] = useState([0, 300000]);
+  const [selectedEnergie, setSelectedEnergie] = useState("");
+  const [selectedBoite, setSelectedBoite] = useState("");
+  const [puissanceRange, setPuissanceRange] = useState([0, 500]);
+  const [isOpen, setIsOpen] = useState(true);
 
-  const energyTypes = ["Essence", "Diesel", "Hybride", "Électrique"];
-  const transmissionTypes = ["Automatique", "Manuelle"];
+  const energieTypes = ["Essence", "Diesel", "Hybrid", "Electric"];
+  const boiteTypes = ["Auto", "Manuelle"];
 
   const handleApplyFilters = () => {
     onFilterChange({
-      marque: searchedMarque, // 👈 garde la marque originale !
+      marque: searchedMarque,
       minPrice: priceRange[0],
       maxPrice: priceRange[1],
       minYear: yearRange[0],
       maxYear: yearRange[1],
-      maxMileage: mileage,
-      energy: selectedEnergy,
-      transmission: selectedTransmission,
+      minKm: kmRange[0],
+      maxKm: kmRange[1],
+      Energie: selectedEnergie,
+      Boite: selectedBoite,
+      minPuissance: puissanceRange[0],
+      maxPuissance: puissanceRange[1]
     });
   };
 
   const handleReset = () => {
-    setPriceRange([0, 100000]);
+    setPriceRange([0, 1000000]);
     setYearRange([1970, new Date().getFullYear()]);
-    setMileage(300000);
-    setSelectedEnergy("");
-    setSelectedTransmission("");
+    setKmRange([0, 300000]);
+    setPuissanceRange([0, 500]);
+    setSelectedEnergie("");
+    setSelectedBoite("");
     onFilterChange({});
   };
 
-  const CustomSlider = ({ min, max, value, onChange, label, unit, step }) => (
-    <div className="mb-8">
-      <h3 className="font-semibold mb-4">{label}</h3>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full range-slider"
-      />
-      <div className="flex justify-between text-sm mt-2">
-        <span>
-          {min.toLocaleString()}
-          {unit}
-        </span>
-        <span>
-          {value.toLocaleString()}
-          {unit}
-        </span>
-        <span>
-          {max.toLocaleString()}
-          {unit}
-        </span>
+  const renderRangeSlider = ({ 
+    label, 
+    icon: Icon, 
+    value, 
+    onChange, 
+    min, 
+    max, 
+    step, 
+    unit 
+  }) => (
+    <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon className="text-blue-500 text-xl" />
+        <h3 className="font-semibold text-gray-800">{label}</h3>
+      </div>
+      <div className="px-2">
+        <div className="relative mb-4">
+          <div className="h-2 bg-gray-200 rounded">
+            <div
+              className="absolute h-2 bg-blue-500 rounded"
+              style={{
+                left: `${((value[0] - min) / (max - min)) * 100}%`,
+                right: `${100 - ((value[1] - min) / (max - min)) * 100}%`
+              }}
+            />
+          </div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={value[0]}
+            step={step}
+            onChange={(e) => onChange([Number(e.target.value), value[1]])}
+            className="absolute w-full h-2 opacity-0 cursor-pointer"
+          />
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={value[1]}
+            step={step}
+            onChange={(e) => onChange([value[0], Number(e.target.value)])}
+            className="absolute w-full h-2 opacity-0 cursor-pointer"
+          />
+        </div>
+        <div className="flex justify-between text-sm text-gray-600">
+          <span>{value[0].toLocaleString()}{unit}</span>
+          <span>{value[1].toLocaleString()}{unit}</span>
+        </div>
       </div>
     </div>
   );
 
-  const CustomRangeSlider = ({
-    min,
-    max,
-    value,
-    onChange,
-    label,
-    unit,
-    step,
-  }) => {
-    const handleMinChange = (e) => {
-      const newMin = Number(e.target.value);
-      onChange([newMin, value[1]]);
-    };
-
-    const handleMaxChange = (e) => {
-      const newMax = Number(e.target.value);
-      onChange([value[0], newMax]);
-    };
-
-    return (
-      <div className="mb-8">
-        <h3 className="font-semibold mb-4">{label}</h3>
-        <div className="relative">
-          <input
-            type="range"
-            min={min}
-            max={max}
-            step={step}
-            value={value[0]}
-            onChange={handleMinChange}
-            className="absolute w-full z-10 opacity-0"
-          />
-          <input
-            type="range"
-            min={min}
-            max={max}
-            step={step}
-            value={value[1]}
-            onChange={handleMaxChange}
-            className="absolute w-full z-10 opacity-0"
-          />
-          <div className="relative h-2 bg-gray-200 rounded-full">
-            <div
-              className="absolute h-full bg-blue-500 rounded-full"
-              style={{
-                left: `${((value[0] - min) / (max - min)) * 100}%`,
-                right: `${100 - ((value[1] - min) / (max - min)) * 100}%`,
-              }}
-            ></div>
-          </div>
-          <div className="flex justify-between text-sm mt-2">
-            <span>
-              {value[0].toLocaleString()}
-              {unit}
-            </span>
-            <span>
-              {value[1].toLocaleString()}
-              {unit}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="w-64 bg-white p-4 shadow-lg h-[calc(100vh-4rem)] fixed left-0 top-16 overflow-y-auto z-40">
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <GiCarKey className="text-blue-500" />
-        Filtres
-      </h2>
-
-      <CustomRangeSlider
-        label="Prix (€)"
-        min={0}
-        max={100000}
-        value={priceRange}
-        onChange={setPriceRange}
-        unit="€"
-        step={1000}
-      />
-
-      <CustomRangeSlider
-        label="Année"
-        min={1970}
-        max={new Date().getFullYear()}
-        value={yearRange}
-        onChange={setYearRange}
-        unit=""
-        step={1}
-      />
-
-      <CustomSlider
-        label="Kilométrage max"
-        min={0}
-        max={300000}
-        value={mileage}
-        onChange={setMileage}
-        unit=" km"
-        step={10000}
-      />
-
-      <div className="mb-8">
-        <h3 className="font-semibold mb-4 flex items-center gap-2">
-          <GiGasPump className="text-blue-500" />
-          Énergie
-        </h3>
-        <div className="space-y-2">
-          {energyTypes.map((type) => (
-            <label key={type} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="energy"
-                value={type}
-                checked={selectedEnergy === type}
-                onChange={(e) => setSelectedEnergy(e.target.value)}
-                className="form-radio text-blue-500"
-              />
-              <span className="text-sm">{type}</span>
-            </label>
-          ))}
+    <div className="fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out z-40">
+      <div className="w-80 h-full bg-gray-50 shadow-xl overflow-y-auto">
+        <div className="sticky top-0 bg-white z-10 p-4 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <GiCarKey className="text-blue-500" />
+              Filtres
+            </h2>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
+              <FaFilter className="text-gray-600" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="mb-8">
-        <h3 className="font-semibold mb-4 flex items-center gap-2">
-          <GiGearStick className="text-blue-500" />
-          Transmission
-        </h3>
-        <div className="space-y-2">
-          {transmissionTypes.map((type) => (
-            <label key={type} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="transmission"
-                value={type}
-                checked={selectedTransmission === type}
-                onChange={(e) => setSelectedTransmission(e.target.value)}
-                className="form-radio text-blue-500"
-              />
-              <span className="text-sm">{type}</span>
-            </label>
-          ))}
+        <div className="p-4 space-y-4">
+          {renderRangeSlider({
+            label: "Prix",
+            icon: FaEuroSign,
+            value: priceRange,
+            onChange: setPriceRange,
+            min: 0,
+            max: 1000000,
+            step: 5000,
+            unit: " TND"
+          })}
+
+          {renderRangeSlider({
+            label: "Année",
+            icon: MdDateRange,
+            value: yearRange,
+            onChange: setYearRange,
+            min: 1970,
+            max: new Date().getFullYear(),
+            step: 1,
+            unit: ""
+          })}
+
+          {renderRangeSlider({
+            label: "Kilométrage",
+            icon: MdSpeed,
+            value: kmRange,
+            onChange: setKmRange,
+            min: 0,
+            max: 300000,
+            step: 5000,
+            unit: " km"
+          })}
+
+          {renderRangeSlider({
+            label: "Puissance",
+            icon: MdOutlineElectricalServices,
+            value: puissanceRange,
+            onChange: setPuissanceRange,
+            min: 0,
+            max: 500,
+            step: 10,
+            unit: " ch"
+          })}
+
+          {/* Énergie */}
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <GiGasPump className="text-blue-500 text-xl" />
+              <h3 className="font-semibold text-gray-800">Énergie</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {energieTypes.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setSelectedEnergie(type === selectedEnergie ? "" : type)}
+                  className={`p-2 rounded-lg text-sm transition-colors ${
+                    selectedEnergie === type
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Boîte de vitesse */}
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <GiGearStick className="text-blue-500 text-xl" />
+              <h3 className="font-semibold text-gray-800">Boîte de vitesse</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {boiteTypes.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setSelectedBoite(type === selectedBoite ? "" : type)}
+                  className={`p-2 rounded-lg text-sm transition-colors ${
+                    selectedBoite === type
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-4">
-        <button
-          onClick={handleApplyFilters}
-          className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          Appliquer les filtres
-        </button>
-        <button
-          onClick={handleReset}
-          className="bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-        >
-          Réinitialiser
-        </button>
+        <div className="sticky bottom-0 bg-white border-t p-4 space-y-2">
+          <button
+            onClick={handleApplyFilters}
+            className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-2.5 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <FaFilter />
+            Appliquer les filtres
+          </button>
+          <button
+            onClick={handleReset}
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 py-2.5 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <FaUndo />
+            Réinitialiser
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default FilterSidebar;
+
