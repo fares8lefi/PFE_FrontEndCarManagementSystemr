@@ -54,8 +54,6 @@ function App() {
         <Route path='/commentCards/:id' element={<CommentCards/>}></Route>
         <Route path='/addCarAnnounecement' element={<AddCarAnnounecement/>}></Route>
         <Route path='/userCars' element={<UserCars/>}></Route>
-        <Route path='/services' element={<Services/>}></Route>
-        <Route path='/contact' element={<Contact/>}></Route>
         <Route path='/profilCard' element={<ProfilCard/>}></Route>{/*id from session*/}
         <Route path='/*' element={<Home/>}></Route>
         {/*<Route path='/*' element={<Error/>}></Route>*/}
