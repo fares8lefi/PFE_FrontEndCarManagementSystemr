@@ -25,6 +25,8 @@ import DashboardAdmin from './Admin/AdminComponent/DashboardAdmin.jsx'
 import SideBarAdmin from './Admin/AdminComponent/SideBarAdmin.jsx'
 import UsersManagement from './Admin/AdminComponent/UsersManagement.jsx'
 import CarManagement  from './Admin/AdminComponent/CarManagement.jsx'
+import MessagesMangement from './Admin/AdminComponent/MessagesMangement.jsx'
+import NavbarAdmin from './Admin/AdminComponent/navbarAdmin.jsx'
 
 function App() {
   return (
@@ -33,7 +35,9 @@ function App() {
      
       <Routes>
       <Route path="/homeAdmin" element={<HomeAdmin />} />
+      <Route path="/navbarAdmin" element={<NavbarAdmin />} />
       <Route path="/dashboardAdmin" element={<DashboardAdmin />} />
+      <Route path="/messagesMangement" element={<MessagesMangement />} />
       <Route path="/sideBarAdmin" element={<SideBarAdmin />} />
       <Route path="/usersManagement" element={<UsersManagement />} />
       <Route path="/carManagement" element={<CarManagement />} />
