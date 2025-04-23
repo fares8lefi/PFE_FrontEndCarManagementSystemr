@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DashboardAdmin from '../AdminComponent/DashboardAdmin';
 import UsersManagement from '../AdminComponent/UsersManagement';
 import CarMangement from '../AdminComponent/CarManagement';
+import MessagesMangement from '../AdminComponent/MessagesMangement';
 
 // Composant Sidebar
 const Sidebar = ({ activeMenu, setActiveMenu }) => (
@@ -12,7 +13,7 @@ const Sidebar = ({ activeMenu, setActiveMenu }) => (
           { key: 'dashboard', label: 'Tableau de bord' },
           { key: 'CarMangement', label: 'Gestion des voitures' },
           { key: 'UsersManagement', label: 'Utilisateurs' },
-          { key: 'notifications', label: 'Notifications' },
+          { key: 'MessagesMangement', label: 'Message' },
         ].map((item) => (
           <button
             key={item.key}
@@ -33,23 +34,18 @@ const AdminLayout = () => {
   const [activeMenu, setActiveMenu] = useState('dashboard');
 
   return (
-    <div className="pt-16"> {/* Padding supérieur ajusté pour un navbar de 64px */}
+    <div className=""> {/* Padding supérieur ajusté pour un navbar de 64px */}
       <div className="flex min-h-screen bg-gray-100">
-        {/* Sidebar toujours visible */}
+      
         <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
 
-        {/* Contenu principal avec marge à gauche */}
+        
         <div className="flex-1 ml-64">
           <main className="p-6 max-w-7xl mx-auto">
             {activeMenu === 'dashboard' && <DashboardAdmin />}
             {activeMenu === 'CarMangement' && <CarMangement />}
             {activeMenu === 'UsersManagement' && <UsersManagement />}
-            {activeMenu === 'notifications' && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-2xl font-semibold text-gray-800">Notifications</h2>
-                <p className="mt-2 text-gray-600">Contenu des notifications à venir.</p>
-              </div>
-            )}
+            {activeMenu === 'MessagesMangement' && <MessagesMangement/> }
           </main>
         </div>
       </div>
