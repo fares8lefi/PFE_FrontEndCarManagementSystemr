@@ -233,7 +233,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-gray-800">Adresse</h3>
-                    <p className="text-gray-600 mt-1">Mahdia hiboun 5197 </p>
+                    <p className="text-gray-600 mt-1">Mahdia hiboun 5100 </p>
                   </div>
                 </div>
 
