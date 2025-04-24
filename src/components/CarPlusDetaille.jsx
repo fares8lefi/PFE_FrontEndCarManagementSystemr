@@ -20,7 +20,7 @@ export default function CarPlusDetaille() {
     }
   }, [id]);
 
-  // Affiche un message de chargement si 'car' est null
+  
   if (!car) {
     return <div className="p-4 text-center">Chargement...</div>;
   }
