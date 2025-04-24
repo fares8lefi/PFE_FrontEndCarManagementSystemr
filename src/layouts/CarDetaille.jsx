@@ -164,8 +164,8 @@ export default function CarDetaille() {
                 </div>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-3xl font-bold text-blue-600">{car.prix} TND</span>
-                <span className="text-sm text-gray-500">Prix négociable</span>
+                <span className="text-3xl font-bold text-blue-600">{car.price} TND</span>
+               
               </div>
             </div>
 
@@ -176,7 +176,7 @@ export default function CarDetaille() {
                   <MdLocalGasStation className="text-2xl text-blue-600" />
                   <div>
                     <p className="text-sm text-gray-500">Carburant</p>
-                    <p className="font-medium">{car.carburant}</p>
+                    <p className="font-medium">{car.Energie}</p>
                   </div>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export default function CarDetaille() {
                   <GiGearStickPattern className="text-2xl text-blue-600" />
                   <div>
                     <p className="text-sm text-gray-500">Boîte</p>
-                    <p className="font-medium">{car.boite}</p>
+                    <p className="font-medium">{car.Boite}</p>
                   </div>
                 </div>
               </div>
@@ -194,16 +194,16 @@ export default function CarDetaille() {
                   <MdSpeed className="text-2xl text-blue-600" />
                   <div>
                     <p className="text-sm text-gray-500">Kilométrage</p>
-                    <p className="font-medium">{car.kilometrage} km</p>
+                    <p className="font-medium">{car.km} km</p>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 p-4 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <GiCarDoor className="text-2xl text-blue-600" />
+                  <MdSpeed className="text-2xl text-blue-600" />
                   <div>
-                    <p className="text-sm text-gray-500">Nombre de portes</p>
-                    <p className="font-medium">{car.portes || '4'}</p>
+                    <p className="text-sm text-gray-500">Puissance Fiscal</p>
+                    <p className="font-medium">{car.Puissance} Ch</p>
                   </div>
                 </div>
               </div>
