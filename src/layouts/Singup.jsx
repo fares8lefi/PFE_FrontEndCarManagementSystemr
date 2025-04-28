@@ -13,7 +13,7 @@ export default function Signup() {
     username: "",
     email: "",
     password: "",
-    user_image: "",
+    user_image: null,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -81,13 +81,18 @@ export default function Signup() {
           password,
         })
       );
-      formData.append("user_image", newUser.user_image);
+  
+      // Si aucune image n'est choisie, charge user.png comme fichier
+      let imageFile = newUser.user_image;
+      if (!imageFile) {
+        imageFile = await getDefaultUserImageFile();
+      }
+      formData.append("user_image", imageFile);
   
       const response = await addUserClientImgOf(formData);
   
       if (response.data.success) {
         toast.success("Enregistrement réussi !");
-        
       }
     } catch (error) {
       console.error(error);
@@ -98,6 +103,12 @@ export default function Signup() {
     }
   };
   
+  async function getDefaultUserImageFile() {
+    const response = await fetch('/user.png');
+    const blob = await response.blob();
+    return new File([blob], "user.png", { type: blob.type });
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       
