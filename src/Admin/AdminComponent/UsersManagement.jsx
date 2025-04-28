@@ -14,6 +14,7 @@ import { toast } from 'react-toastify';
 import { PropagateLoader } from 'react-spinners';
 import { getAllUsers, searchUsers, updateUserStatus, deleteUser} from '../../services/ApiUser'; // Ajoutez createUser
 import { debounce } from './debounce';
+import { useNavigate } from "react-router-dom";
 
 const UsersManagement = () => {
   const [users, setUsers] = useState([]);
@@ -30,6 +31,7 @@ const UsersManagement = () => {
     status: 'active'
   });
   const [isCreating, setIsCreating] = useState(false); // État pour gérer la création
+  const navigate = useNavigate();
 
   const fetchUsers = async (searchQuery = '') => {
     setLoading(true);
@@ -150,6 +152,13 @@ const UsersManagement = () => {
             >
               <FaUserPlus className="mr-2" />
               Créer un compte
+            </button>
+            <button
+              onClick={() => navigate('/admin/add-admin')}
+              className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              <FaUserShield className="mr-2" />
+              Ajouter un admin
             </button>
           </div>
         </div>
