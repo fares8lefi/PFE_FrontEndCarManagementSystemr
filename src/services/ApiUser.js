@@ -6,6 +6,14 @@ export async function getAllUsers() {
   return await axios.get(`${apiurl}/getAllUsers`,)
  
 }
+
+export async function addUserAdmin(formData) {
+  return await axios.post(`${apiurl}/addUserAdmin`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+}
 export async function searchUsers(query) {
   return await axios.get(`${apiurl}/searchUsers`, {
     params: { q: query }
