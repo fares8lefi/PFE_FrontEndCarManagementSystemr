@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getCarById } from "../services/ApiCar";
+import { blurCarPlate } from "../services/ApiAI";
 import CarPlusDetaille from "../components/CarPlusDetaille";
 import CommentCards from "../components/CommentCards";
 import { MdDateRange, MdOutlinePending, MdLocalGasStation, MdSpeed } from "react-icons/md";
@@ -14,6 +15,7 @@ export default function CarDetaille() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [blurredImages, setBlurredImages] = useState([]);
 
   const CarDetails = async () => {
     try {
@@ -22,6 +24,32 @@ export default function CarDetaille() {
       if (response.data) {
         const carData = response.data;
         setCar(carData);
+
+        // ai floutage des images
+        if (Array.isArray(carData.cars_images)) {
+          const promises = carData.cars_images.map(async (imgUrl) => {
+            try {
+              const imgResponse = await fetch(imgUrl);
+              const imgBlob = await imgResponse.blob();
+              const resultBlob = await blurCarPlate(imgBlob);
+              return URL.createObjectURL(resultBlob);
+            } catch (e) {
+              return imgUrl; 
+            }
+          });
+          const blurred = await Promise.all(promises);
+          setBlurredImages(blurred);
+        } else if (carData.cars_images) {
+          // Si une seule image
+          try {
+            const imgResponse = await fetch(carData.cars_images);
+            const imgBlob = await imgResponse.blob();
+            const resultBlob = await blurCarPlate(imgBlob);
+            setBlurredImages([URL.createObjectURL(resultBlob)]);
+          } catch (e) {
+            setBlurredImages([carData.cars_images]);
+          }
+        }
       }
     } catch (error) {
       console.error(error);
@@ -94,7 +122,7 @@ export default function CarDetaille() {
               {car.cars_images ? (
                 <>
                   <img
-                    src={car.cars_images}
+                    src={blurredImages[selectedIndex] || car.cars_images[selectedIndex] || car.cars_images}
                     alt={`${car.marque} ${car.model}`}
                     className="w-full h-full object-contain cursor-zoom-in transition-opacity duration-300"
                     onClick={() => setIsOpen(true)}
@@ -103,9 +131,9 @@ export default function CarDetaille() {
                       e.target.src = '/default-car.png';
                     }}
                   />
-                  {Array.isArray(car.cars_images) && car.cars_images.length > 1 && (
+                  {Array.isArray(blurredImages) && blurredImages.length > 1 && (
                     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                      {selectedIndex + 1} / {car.cars_images.length}
+                      {selectedIndex + 1} / {blurredImages.length}
                     </div>
                   )}
                 </>
@@ -118,10 +146,10 @@ export default function CarDetaille() {
             </div>
 
             {/* Miniatures (si plusieurs images) */}
-            {Array.isArray(car.cars_images) && car.cars_images.length > 1 && (
+            {Array.isArray(blurredImages) && blurredImages.length > 1 && (
               <div className="relative mt-4 px-4">
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                  {car.cars_images.map((image, index) => (
+                  {blurredImages.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedIndex(index)}
@@ -227,7 +255,7 @@ export default function CarDetaille() {
           >
             <div className="relative max-w-[90vw] max-h-[90vh]">
               <img
-                src={car.cars_images}
+                src={blurredImages[selectedIndex] || car.cars_images[selectedIndex] || car.cars_images}
                 alt={`${car.marque} ${car.model}`}
                 className="max-w-full max-h-[90vh] object-contain"
                 onError={(e) => {

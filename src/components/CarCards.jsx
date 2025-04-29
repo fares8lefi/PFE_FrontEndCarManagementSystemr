@@ -9,17 +9,36 @@ import { PropagateLoader } from 'react-spinners';
 import { GiGasPump, GiCarKey } from 'react-icons/gi';
 import { MdOutlineElectricalServices, MdDateRange } from 'react-icons/md';
 import { TbManualGearbox } from 'react-icons/tb';
+import { blurCarPlate } from "../services/ApiAI";
 
 export default function CarCards() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
+  const [blurredImages, setBlurredImages] = useState({});
+  const [processing, setProcessing] = useState({});
 
   const getCars = async () => {
     try {
       const res = await getAllCars();
       setCars(res.data.cars);
+
+      // Traiter toutes les images
+      res.data.cars.forEach(async (car) => {
+        if (car.cars_images) {
+          try {
+            const imgResponse = await fetch(car.cars_images);
+            const imgBlob = await imgResponse.blob();
+            const resultBlob = await blurCarPlate(imgBlob);
+            const url = URL.createObjectURL(resultBlob);
+            setBlurredImages(prev => ({ ...prev, [car._id]: url }));
+          } catch (e) {
+            // fallback: image originale si erreur
+            setBlurredImages(prev => ({ ...prev, [car._id]: car.cars_images }));
+          }
+        }
+      });
     } catch (error) {
       console.error(error);
     } finally {
@@ -65,6 +84,20 @@ export default function CarCards() {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleBlurPlate = async (car) => {
+    setProcessing(prev => ({ ...prev, [car._id]: true }));
+    try {
+      const imgResponse = await fetch(car.cars_images);
+      const imgBlob = await imgResponse.blob();
+      const resultBlob = await blurCarPlate(imgBlob);
+      const url = URL.createObjectURL(resultBlob);
+      setBlurredImages(prev => ({ ...prev, [car._id]: url }));
+    } catch (e) {
+      alert("Erreur lors du traitement IA");
+    }
+    setProcessing(prev => ({ ...prev, [car._id]: false }));
   };
 
   return (
@@ -121,21 +154,15 @@ export default function CarCards() {
             >
               {/* Image Container */}
               <div className="relative h-56 overflow-hidden bg-gray-100">
-                {car.cars_images ? (
-                  <img
-                    src={car.cars_images}
-                    alt={`${car.marque} ${car.model}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/placeholder-car.jpg';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-gray-400">Aucune image disponible</span>
-                  </div>
-                )}
+                <img
+                  src={blurredImages[car._id] || car.cars_images}
+                  alt={`${car.marque} ${car.model}`}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/placeholder-car.jpg';
+                  }}
+                />
                 <div className="absolute top-4 right-4 flex gap-2">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     car.count > 0 
