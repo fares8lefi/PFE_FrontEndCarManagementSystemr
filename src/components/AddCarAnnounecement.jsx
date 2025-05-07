@@ -5,6 +5,19 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCar, FaImage, FaMapMarkerAlt, FaDownload, FaShare, FaTimes, FaEuroSign, FaCogs, FaGasPump, FaCarSide, FaUserTie, FaHandshake, FaCertificate, FaSearch, FaArrowDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+
+export async function blurCarPlate(imageFile) {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  const response = await axios.post(
+    "http://localhost:5000/predict", 
+    formData,
+    { responseType: "blob" }
+  );
+  return response.data; // Blob de l'image floutée
+}
 
 export default function AddCarAnnounecement() {
   const [carData, setCarData] = useState({
@@ -69,7 +82,6 @@ export default function AddCarAnnounecement() {
       for (let i = 0; i < images.length; i++) {
         const file = images[i];
         const hasCar = await detectCarInImage(file);
-        console.log("Vérification IA pour", file.name, ":", hasCar);
         if (!hasCar) {
           toast.error(`L'image ${file.name} ne contient pas de voiture. Veuillez choisir une image valide.`);
           setIsSubmitting(false);
@@ -77,11 +89,22 @@ export default function AddCarAnnounecement() {
         }
       }
 
+      // Appliquer le blur sur chaque image AVANT l'envoi
+      const blurredImages = [];
+      for (let i = 0; i < images.length; i++) {
+        const file = images[i];
+      
+        const blurredBlob = await blurCarPlate(file);
+        
+        const blurredFile = new File([blurredBlob], file.name, { type: blurredBlob.type });
+        blurredImages.push(blurredFile);
+      }
+
       const submitCarData = new FormData();
       Object.keys(carData).forEach((key) => {
         submitCarData.append(key, carData[key]);
       });
-      images.forEach((file) => {
+      blurredImages.forEach((file) => {
         submitCarData.append("images", file);
       });
 
