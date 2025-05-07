@@ -19,7 +19,6 @@ export default function AddCarAnnounecement() {
     Position: "",
     description: "",
   });
-
   const [images, setImages] = useState([]);
   const [qrCode, setQrCode] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,6 +37,23 @@ export default function AddCarAnnounecement() {
     setImages(Array.from(e.target.files)); // Convertir FileList en tableau
   };
 
+  async function detectCarInImage(imageFile) {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    const response = await fetch("http://127.0.0.1:5000/detect-car", {
+      method: "POST",
+      body: formData,
+    });
+
+    // On suppose que le backend retourne true ou false directement
+    const result = await response.json();
+    console.log("Réponse IA:", result);
+    if (typeof result === "boolean") return result;
+    if (typeof result === "object" && "has_car" in result) return result.has_car;
+    return false;
+  }
+
   const SubmitAnounnce = async (e) => {
     e.preventDefault();
     const authToken = localStorage.getItem("authToken");
@@ -48,14 +64,23 @@ export default function AddCarAnnounecement() {
 
     try {
       setIsSubmitting(true);
-      const submitCarData = new FormData();
 
-      // Ajouter les données de la voiture
+      // Vérification IA sur chaque image
+      for (let i = 0; i < images.length; i++) {
+        const file = images[i];
+        const hasCar = await detectCarInImage(file);
+        console.log("Vérification IA pour", file.name, ":", hasCar);
+        if (!hasCar) {
+          toast.error(`L'image ${file.name} ne contient pas de voiture. Veuillez choisir une image valide.`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      const submitCarData = new FormData();
       Object.keys(carData).forEach((key) => {
         submitCarData.append(key, carData[key]);
       });
-
-      // Ajouter les images
       images.forEach((file) => {
         submitCarData.append("images", file);
       });
@@ -69,7 +94,7 @@ export default function AddCarAnnounecement() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Erreur de publié de l'annonce.");
+      toast.error("Erreur de publication de l'annonce.");
     } finally {
       setIsSubmitting(false);
     }
