@@ -78,6 +78,16 @@ export default function Search() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) {
+      navigate("/login", {
+        state: {
+          from: location.pathname,
+          message: "Veuillez vous connecter pour effectuer une recherche.",
+        },
+      });
+      return;
+    }
     navigate(`/search?marque=${encodeURIComponent(searchTerm)}`);
     handleSearch(searchTerm, filters);
   };
@@ -85,6 +95,24 @@ export default function Search() {
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
   };
+
+  function getCarImageSrc(car) {
+    if (!car.cars_images) return null;
+    if (Array.isArray(car.cars_images) && car.cars_images.length > 0) {
+      const img = car.cars_images[0];
+      if (img && img.data && img.contentType) {
+        return `data:${img.contentType};base64,${img.data}`;
+      }
+      return null;
+    }
+    // Si jamais c'est un objet unique
+    if (car.cars_images.data && car.cars_images.contentType) {
+      return `data:${car.cars_images.contentType};base64,${car.cars_images.data}`;
+    }
+    return null;
+  }
+
+  const isLoggedIn = !!localStorage.getItem("authToken");
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -123,15 +151,20 @@ export default function Search() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Rechercher une marque..."
                   className="flex-1 px-6 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={!isLoggedIn}
                 />
                 <button
                   type="submit"
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                  disabled={!isLoggedIn}
                 >
                   <FaSearch />
                   Rechercher
                 </button>
               </form>
+              {!isLoggedIn && (
+                <p className="text-red-500 mt-2">Veuillez vous connecter pour effectuer une recherche.</p>
+              )}
             </div>
 
             {/* Résultats */}
@@ -171,11 +204,9 @@ export default function Search() {
                     onClick={() => navigate(`/carDetaille/${car._id}`)}
                   >
                     <div className="relative h-48">
-                      {car.cars_images && car.cars_images.length > 0 ? (
+                      {getCarImageSrc(car) ? (
                         <img
-                          src={Array.isArray(car.cars_images) 
-                            ? car.cars_images[0] 
-                            : car.cars_images}
+                          src={getCarImageSrc(car)}
                           alt={`${car.marque} ${car.model}`}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
@@ -190,8 +221,15 @@ export default function Search() {
                           <span className="text-sm text-gray-400">Aucune image disponible</span>
                         </div>
                       )}
-                      <div className="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {car.marque}
+                      <div
+                        className={`absolute top-2 right-2 px-3 py-1 rounded-full text-sm font-medium
+                          ${car.statut && car.statut.toLowerCase() === "disponible"
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
+                          }`
+                        }
+                      >
+                        {car.statut}
                       </div>
                     </div>
 
