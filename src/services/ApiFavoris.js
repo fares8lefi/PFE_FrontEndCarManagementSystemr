@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiurl = "http://localhost:3000/favoris"; 
+const apiurl = "http://localhost:3003/favoris"; 
 
 export async function getUserFavorites() {
     return await axios.get(`${apiurl}/getUserFavorites`, {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiurl = "http://localhost:3000/contact";
+const apiurl = "http://localhost:3003/contact";
 
 export async function createMessage(message) {
     return await axios.post(`${apiurl}/createMessage`, message);

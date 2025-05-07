@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiurl = "http://localhost:3000/cars";
+const apiurl = "http://localhost:3003/cars";
 
 export async function getAllCars() {
   return await axios.get(`${apiurl}/getAllCars`);

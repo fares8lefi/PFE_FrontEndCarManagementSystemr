@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiurl = "http://localhost:3000/notification"; 
+const apiurl = "http://localhost:3003/notification"; 
 
 export const getUserNotifications = () => {
   return axios.get(`${apiurl}/getUserNotifications`, {
