@@ -102,42 +102,7 @@ export default function CarCards() {
 
   return (
     <div id="vehicules-section" className="container mx-auto px-4 py-8 min-h-screen">
-      {/* Filtres */}
-      <div className="mb-8">
-        <div className="flex flex-wrap gap-4 justify-center mb-6">
-          <button 
-            onClick={() => setFilter('all')}
-            className={`px-6 py-2 rounded-full transition-all duration-300 ${
-              filter === 'all' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            Tous
-          </button>
-          <button 
-            onClick={() => setFilter('new')}
-            className={`px-6 py-2 rounded-full transition-all duration-300 ${
-              filter === 'new' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            Nouveautés
-          </button>
-          <button 
-            onClick={() => setFilter('popular')}
-            className={`px-6 py-2 rounded-full transition-all duration-300 ${
-              filter === 'popular' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            Populaires
-          </button>
-        </div>
-      </div>
-
+      
       {loading ? (
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
           <PropagateLoader color="#3B82F6" size={15} speedMultiplier={0.8} />
