@@ -76,6 +76,14 @@ export default function UserCars() {
   };
   const navigate = useNavigate();
   const handleAddCarAnnounecement = () => navigate("/addCarAnnounecement");
+  const handleDeleteCar = async (carId) => {
+    try {
+      await deleteCarByID(carId);
+      await getCars(); // Rafraîchit la liste après suppression
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     getCars();
     AOS.init({
@@ -96,21 +104,21 @@ export default function UserCars() {
       {/*formulaire de modification */}
       {editModal.isOpen && (
         <div
-          className="fixed inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center"
+          className="fixed inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setEditModal({ isOpen: false, car: null })}
         >
           <div
-            className="bg-white rounded-lg p-6 w-full max-w-md"
+            className="bg-white rounded-lg p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">
               Modifier {editModal.car?.marque}
             </h2>
             <form onSubmit={submitModification}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 {Object.entries(editModal.formData).map(([key, value]) => (
-                  <div key={key} className="mb-2">
-                    <label className="block text-sm font-medium capitalize">
+                  <div key={key}>
+                    <label className="block text-sm font-medium capitalize mb-1 text-gray-700">
                       {key}
                     </label>
                     <input
@@ -118,22 +126,22 @@ export default function UserCars() {
                       name={key}
                       value={value}
                       onChange={handleChange}
-                      className="mt-1 p-2 border rounded w-full"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setEditModal({ isOpen: false, car: null })}
-                  className="px-4 py-2 bg-gray-500 text-white rounded"
+                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                 >
                   Modifier
                 </button>
@@ -230,7 +238,7 @@ export default function UserCars() {
                         <Edit fontSize="small" />
                       </button>
                       <button
-                        onClick={() => deleteCarByID(car._id)}
+                        onClick={() => handleDeleteCar(car._id)}
                         className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors duration-300"
                       >
                         <Delete fontSize="small" />
