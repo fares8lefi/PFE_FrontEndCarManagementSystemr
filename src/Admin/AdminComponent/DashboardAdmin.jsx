@@ -21,6 +21,8 @@ import {
   getDailyCarAdditions,
   getPriceStatsByBrand,
 } from '../../services/ApiCar';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 // Enregistrement des composants Chart.js
 ChartJS.register(
@@ -91,6 +93,20 @@ const LatestCarsTable = ({ cars, tableHeaderStyle, tableCellStyle }) => (
     </div>
   </div>
 );
+
+const handleDownloadPDF = async () => {
+  const dashboard = document.getElementById("dashboard-content");
+  if (!dashboard) return;
+  const canvas = await html2canvas(dashboard, { scale: 2 });
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF({
+    orientation: "landscape",
+    unit: "px",
+    format: [canvas.width, canvas.height],
+  });
+  pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+  pdf.save("dashboard-rapport.pdf");
+};
 
 const DashboardAdmin = () => {
   const [stats, setStats] = useState(null);
@@ -192,109 +208,122 @@ const DashboardAdmin = () => {
   }
 
   return (
-    <div className="mr-4 max-w-7xl mx-auto mt-10 space-y-8">
-      {/* Section des cartes de statistiques */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Voitures"
-          value={stats?.totalCars?.[0]?.count || 0}
-          format={value => value.toLocaleString()}
-        />
-        <StatCard
-          title="Vues Totales"
-          value={stats?.viewsStats?.[0]?.totalViews || 0}
-          format={value => value.toLocaleString()}
-        />
-        <StatCard
-          title="Prix Moyen"
-          value={stats?.averagePrice?.[0]?.avg}
-          format={value => value ? `${Math.round(value).toLocaleString()} TND` : 'N/A'}
-        />
-        <StatCard
-          title="Marques Populaires"
-          value={stats?.brands?.length || 0}
-        />
-      </section>
+    <>
+      {/* Bouton PDF en haut à droite */}
+      <div className="flex justify-end max-w-7xl mx-auto mt-10">
+        <button
+          onClick={handleDownloadPDF}
+          className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition flex items-center gap-2"
+        >
+          Télécharger le rapport PDF
+        </button>
+      </div>
 
-      {/* Section des graphiques principaux */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Évolution des ajouts de voitures (par jour)
-          </h3>
-          <div className="h-80">
-            <Line
-              data={dailyCarAdditionsData}
-              options={{
-                ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                  title: { text: 'Ajouts quotidiens', display: true },
-                },
-              }}
-            />
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Répartition énergétique</h3>
-          <div className="h-80 relative">
-            {energyTypeData ? (
-              <Doughnut
-                data={energyTypeData}
+      {/* Contenu du dashboard à capturer */}
+      <div id="dashboard-content" className="mr-4 max-w-7xl mx-auto mt-10 space-y-8">
+        {/* Section des cartes de statistiques */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Total Voitures"
+            value={stats?.totalCars?.[0]?.count || 0}
+            format={value => value.toLocaleString()}
+          />
+          <StatCard
+            title="Vues Totales"
+            value={stats?.viewsStats?.[0]?.totalViews || 0}
+            format={value => value.toLocaleString()}
+          />
+          <StatCard
+            title="Prix Moyen"
+            value={stats?.averagePrice?.[0]?.avg}
+            format={value => value ? `${Math.round(value).toLocaleString()} TND` : 'N/A'}
+          />
+          <StatCard
+            title="Marques Populaires"
+            value={stats?.brands?.length || 0}
+          />
+        </section>
+
+        {/* Section des graphiques principaux */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Évolution des ajouts de voitures (par jour)
+            </h3>
+            <div className="h-80">
+              <Line
+                data={dailyCarAdditionsData}
                 options={{
                   ...chartOptions,
                   plugins: {
                     ...chartOptions.plugins,
-                    tooltip: {
-                      callbacks: {
-                        label: ctx =>
-                          `${ctx.label}: ${ctx.raw} (${(
-                            (ctx.raw * 100) /
-                            ctx.dataset.data.reduce((a, b) => a + b, 0)
-                          ).toFixed(1)}%)`,
+                    title: { text: 'Ajouts quotidiens', display: true },
+                  },
+                }}
+              />
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Répartition énergétique</h3>
+            <div className="h-80 relative">
+              {energyTypeData ? (
+                <Doughnut
+                  data={energyTypeData}
+                  options={{
+                    ...chartOptions,
+                    plugins: {
+                      ...chartOptions.plugins,
+                      tooltip: {
+                        callbacks: {
+                          label: ctx =>
+                            `${ctx.label}: ${ctx.raw} (${(
+                              (ctx.raw * 100) /
+                              ctx.dataset.data.reduce((a, b) => a + b, 0)
+                            ).toFixed(1)}%)`,
+                        },
+                      },
+                    },
+                  }}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+                  Aucune donnée disponible
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Section tableau et graphique des prix */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LatestCarsTable
+            cars={latestCars}
+            tableHeaderStyle={tableHeaderStyle}
+            tableCellStyle={tableCellStyle}
+          />
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Prix moyen par marque</h3>
+            <div className="h-96">
+              <Bar
+                data={priceStatsData}
+                options={{
+                  ...chartOptions,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Prix moyen (TND)',
                       },
                     },
                   },
                 }}
               />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
-                Aucune donnée disponible
-              </div>
-            )}
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Section tableau et graphique des prix */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <LatestCarsTable
-          cars={latestCars}
-          tableHeaderStyle={tableHeaderStyle}
-          tableCellStyle={tableCellStyle}
-        />
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Prix moyen par marque</h3>
-          <div className="h-96">
-            <Bar
-              data={priceStatsData}
-              options={{
-                ...chartOptions,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    title: {
-                      display: true,
-                      text: 'Prix moyen (TND)',
-                    },
-                  },
-                },
-              }}
-            />
-          </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 };
 
