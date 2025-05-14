@@ -2,10 +2,12 @@ import React, { useRef, useState } from "react";
 import { addUserClientImgOf } from "../services/ApiUser";
 import Footer from '../components/Footer';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { ToastContainer, toast ,Zoom} from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
+  const navigate = useNavigate();
   const Password = useRef(null);
   const ConfirmPassword = useRef(null);
 
@@ -18,6 +20,7 @@ export default function Signup() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const validateEmail = (email) => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
@@ -28,6 +31,7 @@ export default function Signup() {
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return regex.test(password);
   };
+
   const handleChange = (e) => {
     if (e.target.name === "user_image") {
       if (!e.target.files || e.target.files.length === 0) {
@@ -82,7 +86,6 @@ export default function Signup() {
         })
       );
   
-      // Si aucune image n'est choisie, charge user.png comme fichier
       let imageFile = newUser.user_image;
       if (!imageFile) {
         imageFile = await getDefaultUserImageFile();
@@ -92,7 +95,10 @@ export default function Signup() {
       const response = await addUserClientImgOf(formData);
   
       if (response.data.success) {
-        toast.success("Enregistrement réussi !");
+        toast.success("Inscription réussie !");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       }
     } catch (error) {
       console.error(error);
@@ -110,79 +116,127 @@ export default function Signup() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      
-      <section className="flex flex-col items-center justify-center flex-1 p-6">
-        <div className="border border-gray-300 shadow-2xl shadow-gray-500 p-8 rounded-xl w-full max-w-md bg-white">
-          <h3 className="text-2xl font-bold text-center mb-2">Create Your Account</h3>
-          <p className="text-gray-600 text-center mb-4">Let's Get Started</p>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <section className="flex flex-col items-center justify-center flex-1 p-6 mt-16">
+        <div className="border border-gray-200 shadow-xl rounded-2xl p-8 w-full max-w-md bg-white transform transition-all hover:shadow-2xl">
+          <div className="text-center mb-8">
+            <h3 className="text-3xl font-bold text-gray-800 mb-2">
+              Créer un compte
+            </h3>
+            <p className="text-gray-600">
+              Rejoignez notre communauté
+            </p>
+          </div>
 
-          <input
-            type="text"
-            placeholder="User name"
-            name="username"
-            onChange={handleChange}
-            className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
-          />
-          <input
-            type="email"
-            name="email"
-            onChange={handleChange}
-            placeholder="Enter Your E-Mail"
-            className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
-          />
+          <form className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nom d'utilisateur
+              </label>
+              <input
+                type="text"
+                placeholder="Entrez votre nom d'utilisateur"
+                name="username"
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                onChange={handleChange}
+                placeholder="Entrez votre email"
+                className="w-full bg-gray-50 border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
           
-          <div className="relative mb-3">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              name="password"
-              onChange={handleChange}
-              ref={Password}
-              className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Mot de passe
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Entrez votre mot de passe"
+                  name="password"
+                  onChange={handleChange}
+                  ref={Password}
+                  className="w-full bg-gray-50 border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Confirmer le mot de passe
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  ref={ConfirmPassword}
+                  placeholder="Confirmez votre mot de passe"
+                  onChange={(e) => (ConfirmPassword.current.value = e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Photo de profil
+              </label>
+              <input
+                type="file"
+                name="user_image"
+                onChange={handleChange}
+                accept="image/*"
+                className="w-full bg-gray-50 border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={AddUserClient}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors duration-200 mt-6"
             >
-              {showPassword ?   <Visibility /> :<VisibilityOff />  }
-            </span>
-          </div>
+              S'inscrire
+            </button>
 
-          <div className="relative mb-3">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              ref={ConfirmPassword}
-              placeholder="Confirm your Password"
-              onChange={(e) => (ConfirmPassword.current.value = e.target.value)}
-              className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <span
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-            >
-              {showConfirmPassword ? <Visibility /> :<VisibilityOff />}
-            </span>
-          </div>
-
-          <input
-            type="file"
-            placeholder="Upload your profile image"
-            name="user_image"
-            onChange={handleChange}
-            accept="image/*"
-            className="w-full bg-gray-200 p-3 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
-          />
-
-          <button
-            className="bg-black w-full rounded-3xl py-3 text-white text-center font-semibold hover:bg-gray-800 transition-colors"
-            onClick={AddUserClient}
-            type="button"
-          >
-            Sign Up
-          </button>
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-600">
+                Déjà inscrit ?{" "}
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                  Se connecter
+                </button>
+              </p>
+            </div>
+          </form>
         </div>
-        <ToastContainer
+      </section>
+      <Footer />
+      <ToastContainer
         position="top-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -194,8 +248,6 @@ export default function Signup() {
         pauseOnHover
         theme="colored"
       />
-      </section>
-      <Footer />
     </div>
   );
 }
