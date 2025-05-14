@@ -1,10 +1,10 @@
 import axios from "axios";
+import axiosInstance from './axiosConfig';
 
-const apiurl = "http://localhost:3003/users";
+const apiurl = "/users";
 
 export async function getAllUsers() {
-  return await axios.get(`${apiurl}/getAllUsers`,)
- 
+  return await axiosInstance.get(`${apiurl}/getAllUsers`);
 }
 
 export async function addUserAdmin(formData) {
@@ -34,8 +34,7 @@ export async function addUserClientImgOf(formData) {
 }
 
 export async function loginUser(formData) {
-  return await axios.post(`${apiurl}/loginUser`, formData, {
-    withCredentials: true, // Activer les cookies
+  return await axiosInstance.post(`${apiurl}/loginUser`, formData, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -43,13 +42,8 @@ export async function loginUser(formData) {
 }
 
 export async function getUsersbyId() {
-  return await axios.get(`${apiurl}/getUsersbyId`,
-    {
-      withCredentials: true, // Activer les cookies
-    }
-  );
+  return await axiosInstance.get(`${apiurl}/getUsersbyId`);
 }
-
 
 export async function UpdateUserClientbyId(formData) {
   return await axios.put(`${apiurl}/UpdateUserClientbyId`, formData, {
@@ -60,18 +54,10 @@ export async function UpdateUserClientbyId(formData) {
   });
 }
 
-
 export async function logout() {
-  return await axios.post(`${apiurl}/logout`,
-    {
-      withCredentials: true, // Activer les cookies
-    }
-  );
+  return await axiosInstance.post(`${apiurl}/logout`);
 }
 
-
 export async function changePassword(data) {
-  return await axios.put(`${apiurl}/changePassword`, data, {
-    withCredentials: true
-  });
+  return await axiosInstance.put(`${apiurl}/changePassword`, data);
 }

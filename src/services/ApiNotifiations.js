@@ -1,20 +1,16 @@
-import axios from "axios";
+import axiosInstance from './axiosConfig';
 
-const apiurl = "http://localhost:3003/notification"; 
+const apiurl = "/notification";
 
 export const getUserNotifications = () => {
-  return axios.get(`${apiurl}/getUserNotifications`, {
-    withCredentials: true,
+  return axiosInstance.get(`${apiurl}/getUserNotifications`, {
     headers: {
       "Cache-Control": "no-cache",
     },
   });
 };
 
-
-  export const markAsRead = () => {
-    return axios.put(`${apiurl}/markAsRead`, {}, {
-      withCredentials: true
-    });
-  };
+export const markAsRead = () => {
+  return axiosInstance.put(`${apiurl}/markAsRead`);
+};
   

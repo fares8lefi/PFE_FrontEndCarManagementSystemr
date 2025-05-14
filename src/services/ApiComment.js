@@ -15,3 +15,29 @@ export async function addComment(carId, content) {
       }
     );
   }
+// services/ApiComment.js
+export async function deleteComment(commentId, carId) {
+  return await axios.delete(
+    `${apiurl}/deleteComment`,
+    {
+      data: { commentId, carId }, // Envoyer les données ici
+      withCredentials: true
+    }
+  );
+}
+
+export async function updateComment(commentId, content) {
+  return await axios.put(
+    `${apiurl}/updateComment`,
+    {
+      commentId,
+      content
+    },
+    {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+}

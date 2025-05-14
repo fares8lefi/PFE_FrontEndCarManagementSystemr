@@ -1,12 +1,11 @@
 import axios from "axios";
+import axiosInstance from './axiosConfig';
 
-const apiurl = "http://localhost:3003/favoris"; 
+const apiurl = "/favoris";
 
 export async function getUserFavorites() {
-    return await axios.get(`${apiurl}/getUserFavorites`, {
-      withCredentials: true 
-    });
-  }
+  return await axiosInstance.get(`${apiurl}/getUserFavorites`);
+}
 
 export async function addCarToFavorites(carId) {
     return await axios.post(`${apiurl}/addCarToFavorites`,{carId},

@@ -1,4 +1,5 @@
 import axios from "axios";
+import axiosInstance from './axiosConfig';
 
 const apiurl = "http://localhost:3003/cars";
 
@@ -18,9 +19,7 @@ export const addCarImages = (submitCarData) => {
 };
 
 export const getUserCars = () => {
-  return axios.get(`${apiurl}/getUserCars`,  {
-    withCredentials: true, //activations des cokkies
-  });
+  return axiosInstance.get(`${apiurl}/getUserCars`);
 };
 
 export const deleteCarByID = (carId) => {
@@ -52,16 +51,12 @@ export const getCarStats = () => {
 };
 
 export const getLatestCars = () => {
-  return axios.get(`${apiurl}/getLatestCars`,{
-    withCredentials: true,
-  });
+  return axiosInstance.get(`${apiurl}/getLatestCars`);
 };
 
 
 export const getMonthlySalesStats = () => {
-  return axios.get(`${apiurl}/getMonthlySalesStats`,{
-    withCredentials: true,
-  });
+  return axiosInstance.get(`${apiurl}/getMonthlySalesStats`);
 };
 
 export const getPriceStatsByBrand = () => {
@@ -71,13 +66,9 @@ export const getPriceStatsByBrand = () => {
 };
 
 export const getDailyViewsStats = () => {
-  return axios.get(`${apiurl}/getDailyViewsStats`,{
-    withCredentials: true,
-  });
+  return axiosInstance.get(`${apiurl}/getDailyViewsStats`);
 };
 
 export const getDailyCarAdditions = () => {
-  return axios.get(`${apiurl}/getDailyCarAdditions`,{
-    withCredentials: true,
-  });
+  return axiosInstance.get(`${apiurl}/getDailyCarAdditions`);
 };
