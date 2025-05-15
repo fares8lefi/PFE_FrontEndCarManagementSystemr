@@ -117,13 +117,14 @@ const MessagesMangement = () => {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <PropagateLoader color="#3B82F6" />
-                <p className="mt-4 text-gray-600">Chargement des messages...</p>
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <PropagateLoader color="#3B82F6" />
+                    <p className="mt-4 text-gray-600">Chargement des messages...</p>
+                </div>
             </div>
         );
     }
-
 
     return (
         <div className="mr-4 p-6 bg-gray-50 mt-10 min-h-screen">

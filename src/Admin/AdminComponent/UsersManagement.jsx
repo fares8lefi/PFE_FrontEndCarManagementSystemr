@@ -121,8 +121,11 @@ const UsersManagement = () => {
 
   if (loading) {
     return (
-      <div className="ml-64 mr-4 flex justify-center items-center h-screen">
-        <PropagateLoader color="#3B82F6" size={15} />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <PropagateLoader color="#3B82F6" />
+          <p className="mt-4 text-gray-600">Chargement des utilisateurs...</p>
+        </div>
       </div>
     );
   }

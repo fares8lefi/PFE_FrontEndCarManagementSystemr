@@ -201,8 +201,11 @@ const DashboardAdmin = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <PropagateLoader color="#3B82F6" size={15} speedMultiplier={0.8} />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <PropagateLoader color="#3B82F6" />
+          <p className="mt-4 text-gray-600">Chargement du dashboard...</p>
+        </div>
       </div>
     );
   }
