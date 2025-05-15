@@ -27,7 +27,7 @@ export default function Login() {
     try {
       setIsLoading(true);
       const response = await loginUser(loginData);
-
+      console.log("response du serveure ", response);
       if (response.data?.success) {
         localStorage.setItem("authToken", response.data.token);
         const userRole = response.data.user.role;
@@ -35,7 +35,7 @@ export default function Login() {
         if (userStatus === "Active") {
           toast.success("Connexion réussie !");
           if (userRole === "admin") {
-            navigate("/usersTable");
+            navigate("/homeAdmin");
           } else {
             navigate("/home");
           }
@@ -62,15 +62,16 @@ export default function Login() {
         localStorage.setItem('token', response.data.token);
         const user = response.data.user;
         
-        if (user.status === 'inactive') {
+        if (user.status === 'inactive' && !user.isNewGoogleUser) {
           toast.error('Votre compte est inactif. Veuillez contacter l\'administrateur.');
           return;
         }
 
         toast.success("Connexion avec Google réussie !");
+        
         if (user.role === 'admin') {
           navigate('/homeAdmin');
-        } else if (user.role === 'user') {
+        } else {
           navigate('/home');
         }
       }
