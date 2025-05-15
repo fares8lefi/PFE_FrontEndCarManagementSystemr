@@ -72,3 +72,7 @@ export const getDailyViewsStats = () => {
 export const getDailyCarAdditions = () => {
   return axiosInstance.get(`${apiurl}/getDailyCarAdditions`);
 };
+
+export const updateCarStatus = (carId, isSold) => {
+  return axiosInstance.put(`${apiurl}/updateCarStatus/${carId}`, { isSold });
+};

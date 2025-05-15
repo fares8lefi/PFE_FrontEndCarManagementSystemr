@@ -8,7 +8,7 @@ export async function getUserFavorites() {
 }
 
 export async function addCarToFavorites(carId) {
-    return await axios.post(`${apiurl}/addCarToFavorites`,{carId},
+    return await axiosInstance.post(`${apiurl}/addCarToFavorites`,{carId},
         {
             withCredentials: true,
         }
@@ -16,8 +16,7 @@ export async function addCarToFavorites(carId) {
 }
 
 export async function deleteFavoris(favoriId) {
-    return await axios.delete(`${apiurl}/deleteFavoris`, {
-        data: { carId: favoriId },  // Envoyer les données dans "data" pour une requête DELETE
-        withCredentials: true,
+    return await axiosInstance.delete(`${apiurl}/deleteFavoris`, {
+        data: { carId: favoriId }
     });
 }

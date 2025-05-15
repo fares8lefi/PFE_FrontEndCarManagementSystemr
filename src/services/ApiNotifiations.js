@@ -10,7 +10,13 @@ export const getUserNotifications = () => {
   });
 };
 
-export const markAsRead = () => {
-  return axiosInstance.put(`${apiurl}/markAsRead`);
+export const markAsRead = (notificationId) => {
+  return axiosInstance.put('/notification/markAsRead', 
+    { notificationId: notificationId },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
 };
-  
