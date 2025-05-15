@@ -16,19 +16,20 @@ const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
   const boiteTypes = ["Auto", "Manuelle"];
 
   const handleApplyFilters = () => {
-    onFilterChange({
-      marque: searchedMarque,
-      minPrice: priceRange[0],
-      maxPrice: priceRange[1],
-      minYear: yearRange[0],
-      maxYear: yearRange[1],
-      minKm: kmRange[0],
-      maxKm: kmRange[1],
-      Energie: selectedEnergie,
-      Boite: selectedBoite,
-      minPuissance: puissanceRange[0],
-      maxPuissance: puissanceRange[1]
-    });
+    const filters = {
+      marque: searchedMarque ? searchedMarque.toString() : "",
+      minPrice: Number(priceRange[0]),
+      maxPrice: Number(priceRange[1]),
+      minYear: Number(yearRange[0]),
+      maxYear: Number(yearRange[1]),
+      minKm: Number(kmRange[0]),
+      maxKm: Number(kmRange[1]),
+      Energie: selectedEnergie ? selectedEnergie.toString() : "",
+      Boite: selectedBoite ? selectedBoite.toString() : "",
+      minPuissance: Number(puissanceRange[0]),
+      maxPuissance: Number(puissanceRange[1])
+    };
+    onFilterChange(filters);
   };
 
   const handleReset = () => {

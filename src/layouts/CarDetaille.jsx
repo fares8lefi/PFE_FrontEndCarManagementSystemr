@@ -186,8 +186,12 @@ export default function CarDetaille() {
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                     {car.year}
                   </span>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    {car.statut}
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                    ${car.statut === "Disponible"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                    }`}>
+                    {car.statut === "Disponible" ? "Disponible" : "Vendu"}
                   </span>
                 </div>
               </div>

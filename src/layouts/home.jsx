@@ -73,7 +73,7 @@ export default function Home() {
             <div className="mt-12 flex justify-center gap-4">
               {isLoggedIn && (
                 <button
-                  onClick={() => navigate("/add-car")}
+                  onClick={() => navigate("/addCarAnnounecement")}
                   className="inline-flex items-center px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full transition-all transform hover:-translate-y-1 font-semibold"
                 >
                   + Ajouter une voiture

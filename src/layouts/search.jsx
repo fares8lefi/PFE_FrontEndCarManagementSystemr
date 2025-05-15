@@ -62,11 +62,11 @@ export default function Search() {
       setError(null);
       
       const searchParams = {
-        marque: searchValue,
+        marque: searchValue.toString(),
         ...currentFilters
       };
 
-      const response = await getCarsByMarque(searchParams);
+      const response = await getCarsByMarque(searchValue.toString());
       setCars(response.data.cars || []);
     } catch (err) {
       setError(err.response?.data?.message || "Erreur lors de la recherche");
@@ -88,8 +88,9 @@ export default function Search() {
       });
       return;
     }
-    navigate(`/search?marque=${encodeURIComponent(searchTerm)}`);
-    handleSearch(searchTerm, filters);
+    const searchTermString = searchTerm.toString();
+    navigate(`/search?marque=${encodeURIComponent(searchTermString)}`);
+    handleSearch(searchTermString, filters);
   };
 
   const handleFilterChange = (newFilters) => {

@@ -7,6 +7,7 @@ import { PropagateLoader } from "react-spinners";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import NotificationsCards from "./notificationsCards";
 
 function Navbar() {
   const [user, setUser] = useState({ user_image: null });
@@ -21,6 +22,7 @@ function Navbar() {
   const isLoggedIn = localStorage.getItem("authToken");
   const dropdownRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
+  
   // Gestion des clics exterieurs
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -54,11 +56,12 @@ function Navbar() {
     setLoadingNotifications(true);
     try {
       const response = await getUserNotifications();
-      
       if (response.data?.success && response.data.notifications) {
-        const fetchedNotifications = response.data.notifications;
+        const fetchedNotifications = response.data.notifications
+          .filter(n => n._id || n.id)
+          .map(n => ({ ...n, _id: n._id || n.id }));
         setNotifications(fetchedNotifications);
-  
+
         if (!hasViewedNotifications) {
           const newUnread = fetchedNotifications.filter((n) => !n.read).length;
           setUnreadCount(newUnread);
@@ -70,7 +73,8 @@ function Navbar() {
       setLoadingNotifications(false);
     }
   }, [hasViewedNotifications]);
-  // gestion d'evenment  clik sur l'icône de notifications
+
+  // gestion d'evenment clik sur l'icône de notifications
   const handleNotificationClick = async () => {
     const willShow = !showNotifications;
     setShowNotifications(willShow);
@@ -79,12 +83,27 @@ function Navbar() {
       await getNotifications();
 
       if (unreadCount > 0) {
-        await markAsRead();
+        // Marquer toutes les notifications comme lues
+        // On prend tous les IDs valides
+        const ids = notifications.map(n => n._id || n.id).filter(Boolean);
+        console.log('IDs des notifications à marquer comme lues:', ids);
+        for (const notificationId of ids) {
+          if (!notificationId || notificationId === "undefined") {
+            console.error('ID de notification invalide:', notificationId);
+            continue;
+          }
+          try {
+            await markAsRead(notificationId);
+          } catch (error) {
+            console.error('Erreur lors du markAsRead:', { error, notificationId });
+          }
+        }
         setHasViewedNotifications(true);
         setUnreadCount(0); 
       }
     }
   };
+
   //refraichemet des notifications
   useEffect(() => {
     if (!hasViewedNotifications && isLoggedIn) {
@@ -198,51 +217,37 @@ function Navbar() {
                 </button>
 
                 {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto border border-gray-100">
-                    <div className="p-4 text-gray-800">
-                      <h3 className="font-semibold mb-4 text-lg">
+                  <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl z-50 max-h-[80vh] overflow-y-auto border border-gray-100">
+                    <div className="sticky top-0 p-4 bg-white border-b border-gray-200 flex justify-between items-center z-10">
+                      <h3 className="font-semibold text-gray-800 text-lg">
                         Notifications
                       </h3>
-                      {loadingNotifications ? (
-                        <div className="flex justify-center p-4">
-                          <PropagateLoader
-                            color="#3B82F6"
-                            size={10}
-                            speedMultiplier={0.8}
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          {notifications.length > 0 ? (
-                            notifications.map((notification) => (
-                              <div
-                                key={notification._id}
-                                className={`p-4 border-b last:border-b-0 transition-colors ${
-                                  notification._id === "error"
-                                    ? "bg-red-50 text-red-600 font-semibold"
-                                    : !notification.read
-                                    ? "bg-blue-50"
-                                    : ""
-                                }`}
-                              >
-                                <p className="text-sm">
-                                  {notification.content}
-                                </p>
-                                {notification.createdAt && (
-                                  <p className="text-xs text-gray-500 mt-1">
-                                    {formatDate(notification.createdAt)}
-                                  </p>
-                                )}
-                              </div>
-                            ))
-                          ) : (
-                            <p className="text-center text-gray-500 py-4">
-                              Aucune nouvelle notification
-                            </p>
-                          )}
-                        </>
-                      )}
+                      <button 
+                        onClick={() => setShowNotifications(false)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
                     </div>
+                    
+                    {loadingNotifications ? (
+                      <div className="flex justify-center p-4">
+                        <div className="text-center">
+                          <PropagateLoader color="#3B82F6" size={8} />
+                          <p className="mt-2 text-gray-600 text-sm">Chargement...</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 notifications-container">
+                        <NotificationsCards 
+                          initialNotifications={notifications} 
+                          compact={true} 
+                          onClose={() => setShowNotifications(false)}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
