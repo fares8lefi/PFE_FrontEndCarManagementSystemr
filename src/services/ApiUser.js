@@ -61,3 +61,26 @@ export async function logout() {
 export async function changePassword(data) {
   return await axiosInstance.put(`${apiurl}/changePassword`, data);
 }
+
+export async function forgotPassword(email) {
+  return await axiosInstance.post(`${apiurl}/forgotPassword`, { email });
+}
+
+export async function verifyResetCode(email, resetCode) {
+  return await axiosInstance.post(`${apiurl}/verifyResetCode`, {
+    email: email,
+    code: resetCode
+  });
+}
+
+export async function resetPassword(email, resetCode, newPassword) {
+  if (!email || !resetCode || !newPassword) {
+    throw new Error('Email, code et nouveau mot de passe sont requis');
+  }
+
+  return await axiosInstance.post(`${apiurl}/resetPassword`, {
+    email: email.trim(),
+    code: resetCode.trim(),
+    newPassword: newPassword.trim()
+  });
+}
