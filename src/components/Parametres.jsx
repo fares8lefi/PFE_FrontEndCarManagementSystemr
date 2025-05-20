@@ -182,12 +182,12 @@ export default function Parametres() {
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                     {showPassword ? (
-                      <VisibilityOff
+                      <Visibility
                         className="h-5 w-5 text-gray-400 cursor-pointer"
                         onClick={() => setShowPassword(false)}
                       />
                     ) : (
-                      <Visibility
+                      <VisibilityOff
                         className="h-5 w-5 text-gray-400 cursor-pointer"
                         onClick={() => setShowPassword(true)}
                       />
@@ -213,12 +213,12 @@ export default function Parametres() {
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                     {showNewPassword ? (
-                      <VisibilityOff
+                      <Visibility
                         className="h-5 w-5 text-gray-400 cursor-pointer"
                         onClick={() => setShowNewPassword(false)}
                       />
                     ) : (
-                      <Visibility
+                      <VisibilityOff
                         className="h-5 w-5 text-gray-400 cursor-pointer"
                         onClick={() => setShowNewPassword(true)}
                       />
@@ -244,12 +244,12 @@ export default function Parametres() {
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                     {showConfirmPassword ? (
-                      <VisibilityOff
+                      <Visibility
                         className="h-5 w-5 text-gray-400 cursor-pointer"
                         onClick={() => setShowConfirmPassword(false)}
                       />
                     ) : (
-                      <Visibility
+                      <VisibilityOff
                         className="h-5 w-5 text-gray-400 cursor-pointer"
                         onClick={() => setShowConfirmPassword(true)}
                       />
