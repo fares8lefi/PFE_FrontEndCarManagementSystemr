@@ -5,6 +5,7 @@ import { GiGasPump, GiCarKey } from "react-icons/gi";
 import { MdOutlineElectricalServices, MdDateRange } from "react-icons/md";
 import { GiPositionMarker } from "react-icons/gi";
 import { TbManualGearboxFilled } from "react-icons/tb";
+import { FaPhone } from "react-icons/fa";
 
 export default function CarPlusDetaille() {
   const { id } = useParams();
@@ -65,6 +66,14 @@ export default function CarPlusDetaille() {
           <p className="font-semibold text-gray-700"> Énergie</p>
           <p className="text-lg text-blue-600">{car.Energie}</p>
         </span>
+
+        {car.phone && (
+          <span className="mb-2 flex flex-col items-center">
+            <FaPhone className="w-5 h-5 " aria-hidden="true" />
+            <p className="font-semibold text-gray-700">Contact</p>
+            <p className="text-lg text-blue-600">{car.phone}</p>
+          </span>
+        )}
       </div>
     </div>
   );
