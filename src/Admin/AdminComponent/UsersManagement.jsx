@@ -15,7 +15,7 @@ import { PropagateLoader } from 'react-spinners';
 import { getAllUsers, searchUsers, updateUserStatus, deleteUser} from '../../services/ApiUser'; // Ajoutez createUser
 import { debounce } from './debounce';
 import { useNavigate } from "react-router-dom";
-
+import {getAllCars} from "../../services/ApiCar";
 const UsersManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +76,7 @@ const UsersManagement = () => {
     try {
       await deleteUser(userId);
       await fetchUsers(searchTerm);
+      await getAllCars();
       toast.success("Utilisateur supprimé avec succès");
     } catch (error) {
       toast.error(error.response?.data?.message || "Échec de la suppression");
