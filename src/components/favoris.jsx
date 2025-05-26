@@ -9,7 +9,8 @@ import { GiGasPump } from 'react-icons/gi';
 import { TbManualGearbox } from 'react-icons/tb';
 import { MdDateRange } from 'react-icons/md';
 import { AttachMoney, CheckCircle, Cancel } from '@mui/icons-material';
-
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 export default function Favoris() {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,9 +32,8 @@ export default function Favoris() {
   const deleteFavori = async (favoriId) => {
     try {
       const response = await deleteFavoris(favoriId);
-      if (response.status === 200) {
-        setFavorites(response.data.favorites);
-      }
+      toast.success("Favori supprimé avec succès");
+      getFavorites()
     } catch (error) {
       console.error(error);
     }
@@ -181,7 +181,20 @@ export default function Favoris() {
               );
             })
           )}
+          <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
         </div>
+        
       )}
     </div>
   );

@@ -3,29 +3,71 @@ import { getUsersbyId } from "../services/ApiUser";
 import Favoris from "../components/Favoris";
 import UserCars from "../components/UserCars";
 import EditProfileForm from "../components/EditProfileForm";
-import Parametres from '../components/Parametres'
+import Parametres from '../components/Parametres';
+import { PropagateLoader } from 'react-spinners';
 
 export default function ProfileCard() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("mes-vehicules");
-  const [user, setUser] = useState({
-    username: "",
-    email: "",
-    user_image: "",
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
 
   const UserData = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await getUsersbyId();
-      setUser(response.data.user);
+      if (response?.data?.user) {
+        setUser(response.data.user);
+      } else {
+        setError('No user data received');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching user data:', error);
+      setError('Failed to load user data. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     UserData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto mt-10 px-4 flex justify-center items-center min-h-[400px]">
+        <PropagateLoader color="#3B82F6" size={15} speedMultiplier={0.8} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto mt-10 px-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-red-600">{error}</p>
+          <button 
+            onClick={UserData}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto mt-10 px-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <p className="text-yellow-600">No user data available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto mt-10 px-4">
@@ -48,8 +90,8 @@ export default function ProfileCard() {
           </div>
 
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-800">{user.username}</h1>
-            <p className="text-gray-600">{user.email}</p>
+            <h1 className="text-xl font-bold text-gray-800">{user.username || 'User'}</h1>
+            <p className="text-gray-600">{user.email || 'No email provided'}</p>
           </div>
 
           <div className="mt-4 md:mt-0">
@@ -92,7 +134,7 @@ export default function ProfileCard() {
         {activeTab === "Parametres" && <Parametres key="Parametres" />}
       </div>
 
-      {showEditDialog && (
+      {showEditDialog && user && (
         <EditProfileForm
           user={user}
           onClose={() => setShowEditDialog(false)}

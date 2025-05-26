@@ -37,7 +37,7 @@ export default function Login() {
           if (userRole === "admin") {
             navigate("/homeAdmin");
           } else {
-            navigate("/home");
+            navigate("/");
           }
         }
       } else {
@@ -54,12 +54,17 @@ export default function Login() {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       setIsLoading(true);
+      console.log('Google login response:', credentialResponse);
+      
       const response = await axiosInstance.post('/users/googleLogin', {
         credential: credentialResponse.credential
       });
 
+      console.log('Server response:', response.data);
+
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('authToken', response.data.token);
         const user = response.data.user;
         
         if (user.status === 'inactive' && !user.isNewGoogleUser) {
@@ -70,9 +75,9 @@ export default function Login() {
         toast.success("Connexion avec Google réussie !");
         
         if (user.role === 'admin') {
-          navigate('/homeAdmin');
+          navigate('/admin/dashboard');
         } else {
-          navigate('/home');
+          navigate('/');
         }
       }
     } catch (error) {
@@ -90,7 +95,11 @@ export default function Login() {
 
   const handleGoogleError = (error) => {
     console.error('Google Sign-In error:', error);
-    toast.error('Erreur lors de la connexion avec Google');
+    if (error.error === 'popup_closed_by_user') {
+      toast.info('Connexion annulée');
+    } else {
+      toast.error('Erreur lors de la connexion avec Google');
+    }
   };
 
   return (
@@ -119,6 +128,9 @@ export default function Login() {
               ux_mode="popup"
               context="signin"
               hosted_domain=""
+              auto_select={false}
+              cancel_on_tap_outside={true}
+              prompt_parent_id="google-login-button"
             />
           </div>
 

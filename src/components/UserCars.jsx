@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getUserCars, deleteCarByID, UpdateCarById } from "../services/ApiCar";
-import { Delete, Edit, CheckCircle } from "@mui/icons-material";
+import { getUserCars, deleteCarByID, UpdateCarById, updateCarStatus } from "../services/ApiCar";
+import { Delete, Edit, CheckCircle, QrCode2 } from "@mui/icons-material";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -13,23 +13,39 @@ import { MdOutlineElectricalServices, MdDateRange } from 'react-icons/md';
 import { TbManualGearbox } from 'react-icons/tb';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { getCarQRCode } from "../services/ApiQrCode";
+import { toast } from 'react-toastify';
 
 export default function UserCars() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [editModal, setEditModal] = useState({
     isOpen: false,
     car: null,
   });
+  const [qrCodeModal, setQrCodeModal] = useState({
+    isOpen: false,
+    qrCode: null,
+    carInfo: null
+  });
+  const [processing, setProcessing] = useState({});
 
-  
   const getCars = async () => {
     try {
       setLoading(true);
+      setError(null);
       const res = await getUserCars();
-      setCars(res.data.cars);
+      if (res?.data?.cars) {
+        setCars(res.data.cars);
+      } else {
+        setCars([]);
+        console.warn('No cars data received from API');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching cars:', error);
+      setError('Failed to load cars. Please try again later.');
+      setCars([]);
     } finally {
       setLoading(false);
     }
@@ -84,6 +100,36 @@ export default function UserCars() {
       console.error(error);
     }
   };
+
+  const handleShowQRCode = async (car) => {
+    try {
+      const response = await getCarQRCode(car._id);
+      setQrCodeModal({
+        isOpen: true,
+        qrCode: response.data.qrCode,
+        carInfo: car
+      });
+      console.log("QR Code récupéré avec succès");
+    } catch (error) {
+      toast.error("Erreur lors de la récupération du QR code");
+      console.error(error);
+    }
+  };
+
+  const handleUpdateCarStatus = async (carId, currentStatus) => {
+    try {
+      setProcessing(prev => ({ ...prev, [carId]: true }));
+      await updateCarStatus(carId, !currentStatus);
+      toast.success(currentStatus ? "Véhicule marqué comme disponible" : "Véhicule marqué comme vendu");
+      await getCars(); // Rafraîchir la liste
+    } catch (error) {
+      console.error('Error updating car status:', error);
+      toast.error("Erreur lors de la mise à jour du statut");
+    } finally {
+      setProcessing(prev => ({ ...prev, [carId]: false }));
+    }
+  };
+
   useEffect(() => {
     getCars();
     AOS.init({
@@ -93,6 +139,22 @@ export default function UserCars() {
     return () => AOS.refresh();
   }, []);
   
+  if (error) {
+    return (
+      <div className="p-4 max-w-4xl mx-auto text-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <p className="text-red-600">{error}</p>
+          <button 
+            onClick={getCars}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 max-w-4xl mx-auto">
       {/* Titre et description */}
@@ -159,6 +221,38 @@ export default function UserCars() {
           Ajouter une annonce
         </button>
       </div>
+      {/* Modal QR Code */}
+      {qrCodeModal.isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setQrCodeModal({ isOpen: false, qrCode: null, carInfo: null })}
+        >
+          <div
+            className="bg-white rounded-lg p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4">
+              QR Code - {qrCodeModal.carInfo?.marque} {qrCodeModal.carInfo?.model}
+            </h2>
+            <div className="flex flex-col items-center">
+              <img
+                src={qrCodeModal.qrCode}
+                alt="QR Code"
+                className="w-64 h-64 mb-4"
+              />
+              <p className="text-gray-600 text-sm mb-4">
+                Scannez ce QR code pour accéder aux détails de la voiture
+              </p>
+              <button
+                onClick={() => setQrCodeModal({ isOpen: false, qrCode: null, carInfo: null })}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* liste des voitures */}
       {loading ? (
         <div className="flex justify-center py-12">
@@ -170,7 +264,7 @@ export default function UserCars() {
         </div>
       ) : (
         <div className="space-y-6">
-          {cars.length === 0 ? (
+          {!cars || cars.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-xl">Aucune voiture trouvée</p>
             </div>
@@ -243,16 +337,30 @@ export default function UserCars() {
                       >
                         <Delete fontSize="small" />
                       </button>
+                      <button
+                        onClick={() => handleShowQRCode(car)}
+                        className="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50 transition-colors duration-300"
+                      >
+                        <QrCode2 fontSize="small" />
+                      </button>
                     </div>
                     <button
+                      onClick={() => handleUpdateCarStatus(car._id, car.isSold)}
+                      disabled={processing[car._id]}
                       className={`flex items-center gap-1 px-4 py-2 rounded-lg transition-colors duration-300 text-sm font-medium shadow-sm ${
                         car.isSold 
                           ? 'bg-green-600 text-white hover:bg-green-700' 
                           : 'bg-green-100 text-green-700 hover:bg-green-200'
-                      }`}
+                      } ${processing[car._id] ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <CheckCircle fontSize="small" />
-                      {car.isSold ? 'Vendu' : 'Marquer comme vendu'}
+                      {processing[car._id] ? (
+                        <PropagateLoader color={car.isSold ? "#ffffff" : "#15803d"} size={8} />
+                      ) : (
+                        <>
+                          <CheckCircle fontSize="small" />
+                          {car.isSold ? 'Vendu' : 'Marquer comme vendu'}
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
