@@ -1,23 +1,11 @@
 import { React, useState } from "react";
 import { addCarImages } from "../services/ApiCar";
+import { blurCarPlate, detectCarInImage } from "../services/ApiAI";
 import Navbar from "./Navbar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaCar, FaImage, FaMapMarkerAlt, FaDownload, FaShare, FaTimes, FaEuroSign, FaCogs, FaGasPump, FaCarSide, FaUserTie, FaHandshake, FaCertificate, FaSearch, FaArrowDown } from 'react-icons/fa';
+import { FaCar, FaImage, FaMapMarkerAlt, FaDownload, FaShare, FaTimes, FaEuroSign, FaCogs, FaGasPump, FaCarSide, FaUserTie, FaHandshake, FaCertificate, FaSearch, FaArrowDown, FaPhone } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
-
-export async function blurCarPlate(imageFile) {
-  const formData = new FormData();
-  formData.append("image", imageFile);
-
-  const response = await axios.post(
-    "http://localhost:5000/predict", 
-    formData,
-    { responseType: "blob" }
-  );
-  return response.data; // Blob de l'image floutée
-}
 
 export default function AddCarAnnounecement() {
   const [carData, setCarData] = useState({
@@ -31,6 +19,7 @@ export default function AddCarAnnounecement() {
     Boite: "Manuelle",
     Position: "",
     description: "",
+    phone: "",
   });
   const [images, setImages] = useState([]);
   const [qrCode, setQrCode] = useState(null);
@@ -50,28 +39,11 @@ export default function AddCarAnnounecement() {
     setImages(Array.from(e.target.files)); // Convertir FileList en tableau
   };
 
-  async function detectCarInImage(imageFile) {
-    const formData = new FormData();
-    formData.append("image", imageFile);
-
-    const response = await fetch("http://127.0.0.1:5000/detect-car", {
-      method: "POST",
-      body: formData,
-    });
-
-    // On suppose que le backend retourne true ou false directement
-    const result = await response.json();
-    console.log("Réponse IA:", result);
-    if (typeof result === "boolean") return result;
-    if (typeof result === "object" && "has_car" in result) return result.has_car;
-    return false;
-  }
-
   const SubmitAnounnce = async (e) => {
     e.preventDefault();
     const authToken = localStorage.getItem("authToken");
     if (!authToken) {
-      alert("Vous êtes non connecté");
+      toast.error("Vous devez être connecté pour publier une annonce");
       return;
     }
 
@@ -81,25 +53,45 @@ export default function AddCarAnnounecement() {
       // Vérification IA sur chaque image
       for (let i = 0; i < images.length; i++) {
         const file = images[i];
-        const hasCar = await detectCarInImage(file);
-        if (!hasCar) {
-          toast.error(`L'image ${file.name} ne contient pas de voiture. Veuillez choisir une image valide.`);
+        try {
+          const result = await detectCarInImage(file);
+          
+          if (!result.hasCar) {
+            toast.error(`L'image ${file.name} ne contient pas de voiture. Veuillez choisir une image valide.`);
+            setIsSubmitting(false);
+            return;
+          }
+          
+          console.log(`Image ${i + 1} - Détection réussie:`, {
+            détails: result.details,
+            confiance: `${(result.confidence * 100).toFixed(1)}%`
+          });
+        } catch (error) {
+          console.error(`Erreur lors de la détection de l'image ${i + 1}:`, error);
+          toast.error(`Erreur lors de l'analyse de l'image ${i + 1}`);
           setIsSubmitting(false);
           return;
         }
       }
 
-      // Appliquer le blur sur chaque image AVANT l'envoi
+      // Appliquer le blur sur chaque image
       const blurredImages = [];
       for (let i = 0; i < images.length; i++) {
         const file = images[i];
-      
-        const blurredBlob = await blurCarPlate(file);
-        
-        const blurredFile = new File([blurredBlob], file.name, { type: blurredBlob.type });
-        blurredImages.push(blurredFile);
+        try {
+          const blurredBlob = await blurCarPlate(file);
+          const blurredFile = new File([blurredBlob], file.name, { type: blurredBlob.type });
+          blurredImages.push(blurredFile);
+          console.log(`Image ${i + 1} - Plaque floutée avec succès`);
+        } catch (error) {
+          console.error(`Erreur lors du floutage de l'image ${i + 1}:`, error);
+          toast.error(`Erreur lors du traitement de l'image ${i + 1}`);
+          setIsSubmitting(false);
+          return;
+        }
       }
 
+      // Préparation des données pour l'envoi
       const submitCarData = new FormData();
       Object.keys(carData).forEach((key) => {
         submitCarData.append(key, carData[key]);
@@ -108,16 +100,17 @@ export default function AddCarAnnounecement() {
         submitCarData.append("images", file);
       });
 
+      // Envoi des données
       const response = await addCarImages(submitCarData);
 
       if (response.data) {
-        toast.success("Annonce publiée!");
+        toast.success("Annonce publiée avec succès!");
         setQrCode(response.data.qrCode);
         setIsModalOpen(true);
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Erreur de publication de l'annonce.");
+      console.error("Erreur lors de la publication:", error);
+      toast.error("Erreur lors de la publication de l'annonce");
     } finally {
       setIsSubmitting(false);
     }
@@ -218,6 +211,28 @@ export default function AddCarAnnounecement() {
                         required
                       />
                     </div>
+                  </div>
+
+                  <div className="group">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <div className="flex items-center gap-2">
+                        <FaPhone className="text-blue-600" />
+                        Numéro de téléphone
+                      </div>
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={carData.phone}
+                      onChange={handleChange}
+                      placeholder="Ex: 2X XXX XXX"
+                      maxLength="8"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 group-hover:border-blue-400"
+                      required
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Format: 8 chiffres (commence par 2, 4, 5, 7 ou 9)
+                    </p>
                   </div>
                 </div>
               </div>
