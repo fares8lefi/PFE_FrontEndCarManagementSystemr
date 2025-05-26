@@ -9,6 +9,7 @@ import { PropagateLoader } from 'react-spinners';
 import { GiGasPump, GiCarKey } from 'react-icons/gi';
 import { MdOutlineElectricalServices, MdDateRange } from 'react-icons/md';
 import { TbManualGearbox } from 'react-icons/tb';
+import { FaPhone } from 'react-icons/fa';
 import { blurCarPlate } from "../services/ApiAI";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
@@ -76,6 +77,12 @@ export default function CarCards() {
   };
   
   const handleCarClick = (carId) => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      toast.info('Veuillez vous connecter pour voir les détails de la voiture');
+      navigate('/login');
+      return;
+    }
     navigate(`/carDetaille/${carId}`);
   };
 
@@ -196,14 +203,24 @@ export default function CarCards() {
                 </div>
               </div>
 
-              {/* Position si disponible */}
-              {car.Position && (
-                <div className="mb-4 px-3 py-1 bg-gray-50 rounded-lg inline-block">
-                  <p className="text-sm text-gray-600">
-                    📍 {car.Position}
-                  </p>
-                </div>
-              )}
+              {/* Position et Téléphone */}
+              <div className="mb-4 space-y-2">
+                {car.Position && (
+                  <div className="px-3 py-1 bg-gray-50 rounded-lg inline-block">
+                    <p className="text-sm text-gray-600">
+                      📍 {car.Position}
+                    </p>
+                  </div>
+                )}
+                {car.phone && (
+                  <div className="px-3 py-1 bg-gray-50 rounded-lg inline-block">
+                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                      <FaPhone className="text-blue-600" />
+                      {car.phone}
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Footer */}
               <div className="flex justify-between items-center pt-4 border-t border-gray-100">
@@ -236,7 +253,7 @@ export default function CarCards() {
         pauseOnHover
         theme="colored"
       />
-      {/* Message si aucune voiture */}
+      
       {!loading && cars.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">
