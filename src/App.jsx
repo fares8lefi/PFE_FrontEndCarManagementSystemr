@@ -32,6 +32,8 @@ import AddADmin from './Admin/AdminComponent/addAdmin.jsx'
 import ForgotPassword from "./layouts/ForgotPassword";
 import NotificationsCards from './components/notificationsCards.jsx'
 import ProfilAdmin from './Admin/AdminComponent/profilAdmin.jsx'
+import AllCars from './Admin/AdminComponent/AllCars';
+
 function App() {
   return (
     <GoogleOAuthProvider 
@@ -78,7 +80,15 @@ function App() {
         <Route path='/profilCard' element={<ProfilCard/>}></Route>{/*id from session*/}
         <Route path='/*' element={<Home/>}></Route>
         <Route path='/notificationsCards' element={<NotificationsCards/>}></Route>
+        <Route path="allCars" element={<AllCars />} />
         {/*<Route path='/*' element={<Error/>}></Route>*/}
+        <Route path="/admin/*" element={<HomeAdmin />}>
+          <Route path="dashboard" element={<DashboardAdmin />} />
+          <Route path="carManagement" element={<CarManagement />} />
+          <Route path="usersManagement" element={<UsersManagement />} />
+          <Route path="messagesMangement" element={<MessagesMangement />} />
+          <Route path="allCars" element={<AllCars />} />
+        </Route>
       </Routes>
     </GoogleOAuthProvider>
   )
