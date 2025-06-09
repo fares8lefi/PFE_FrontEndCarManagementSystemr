@@ -20,3 +20,14 @@ export const markAsRead = (notificationId) => {
     }
   );
 };
+
+export const broadcastNotification = (message) => {
+  return axiosInstance.post(`${apiurl}/broadcast`, 
+    { content: message },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+};

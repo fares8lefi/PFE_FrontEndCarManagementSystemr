@@ -39,8 +39,36 @@ export const UpdateCarById = (carId, updatedData) => {
 export const getCarsByMarque = (marque) =>
   axios.get(`${apiurl}/getCarsByMarque`, { params: { marque } });
 
-export const getCarsFiltered = (filters = {}) =>
-  axios.get(`${apiurl}/getCarsFiltered`, { params: filters });
+export const getCarsFiltered = (filters = {}) => {
+  // Formatage des filtres selon ce que le backend attend
+  const formattedFilters = {
+    marque: filters.marque || '',
+    maxPrice: Number(filters.maxPrice) || 1000000,
+    minYear: Number(filters.minYear) || 1900,
+    maxYear: Number(filters.maxYear) || new Date().getFullYear(),
+    minKm: Number(filters.minKm) || 0,
+    maxKm: Number(filters.maxKm) || 1000000,
+    Energie: filters.Energie || 'Diesel', // Valeur par défaut
+    Boite: filters.Boite || 'Manuelle', // Valeur par défaut
+  };
+
+  // Vérification que tous les filtres requis sont présents
+  const requiredFilters = ['marque', 'maxPrice', 'minYear', 'maxYear', 'maxKm', 'Energie', 'Boite'];
+  const missingFilters = requiredFilters.filter(filter => !formattedFilters[filter]);
+
+  if (missingFilters.length > 0) {
+    console.error('Filtres manquants:', missingFilters);
+    return Promise.reject(new Error('Tous les filtres doivent être appliqués'));
+  }
+
+  // Log pour débogage
+  console.log('URL de la requête:', `${apiurl}/getCarsFiltered`);
+  console.log('Paramètres envoyés:', formattedFilters);
+
+  return axios.get(`${apiurl}/getCarsFiltered`, { 
+    params: formattedFilters
+  });
+};
 
 
 
