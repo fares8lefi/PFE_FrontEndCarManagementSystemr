@@ -27,20 +27,70 @@ export default function Search() {
       setIsLoading(true);
       setError(null);
       let response;
-      const filtereByMarque = { ...filters, marque };
+      
+      // Log des filtres reçus
+      console.log('Filtres reçus:', filters);
+      
+      // Formatage des filtres selon ce que le backend attend
+      const formattedFilters = {
+        marque,
+        maxPrice: Number(filters.maxPrice) || 1000000,
+        minYear: Number(filters.minYear) || 1900,
+        maxYear: Number(filters.maxYear) || new Date().getFullYear(),
+        minKm: Number(filters.minKm) || 0,
+        maxKm: Number(filters.maxKm) || 1000000,
+        Energie: filters.Energie || 'Diesel',
+        Boite: filters.Boite || 'Manuelle'
+      };
+
+      // Log des filtres formatés
+      console.log('Filtres formatés:', formattedFilters);
+
+      // Vérification des filtres requis
+      const requiredFilters = ['marque', 'maxPrice', 'minYear', 'maxYear', 'maxKm', 'Energie', 'Boite'];
+      const missingFilters = requiredFilters.filter(filter => {
+        const value = formattedFilters[filter];
+        console.log(`Vérification du filtre ${filter}:`, value);
+        return value === undefined || value === null || value === '';
+      });
+
+      if (missingFilters.length > 0) {
+        console.log('Filtres manquants:', missingFilters);
+        setError('Veuillez remplir tous les filtres requis');
+        setCars([]);
+        return;
+      }
 
       if (Object.keys(filters).length === 0) {
         response = await getCarsByMarque(marque);
-        console.log(response.data)
       } else {
-        response = await getCarsFiltered(filtereByMarque);
+        // Log pour débogage
+        console.log('Envoi des filtres au backend:', formattedFilters);
+        response = await getCarsFiltered(formattedFilters);
       }
 
       if (response.data.cars) {
         setCars(response.data.cars);
+        // Si aucun résultat n'est trouvé, afficher un message
+        if (response.data.cars.length === 0) {
+          setError(`Aucun véhicule trouvé pour la marque "${marque}" avec les critères suivants :
+            - Prix maximum : ${formattedFilters.maxPrice.toLocaleString()} TND
+            - Année : ${formattedFilters.minYear} - ${formattedFilters.maxYear}
+            - Kilométrage maximum : ${formattedFilters.maxKm.toLocaleString()} km
+            - Énergie : ${formattedFilters.Energie}
+            - Boîte : ${formattedFilters.Boite}`);
+        }
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur de chargement");
+      console.error('Erreur de recherche:', err);
+      if (err.response) {
+        console.error('Détails de l\'erreur:', {
+          status: err.response.status,
+          data: err.response.data,
+          headers: err.response.headers
+        });
+      }
+      setError(err.response?.data?.message || "Erreur lors de la recherche des véhicules");
       setCars([]);
     } finally {
       setIsLoading(false);
@@ -53,6 +103,11 @@ export default function Search() {
       getCars();
     }
   }, [marque, filters]);
+
+  // Ajout d'un useEffect pour le débogage des filtres
+  useEffect(() => {
+    console.log('État actuel des filtres:', filters);
+  }, [filters]);
 
   const handleSearch = async (searchValue, currentFilters = {}) => {
     if (!searchValue.trim()) return;
@@ -189,12 +244,46 @@ export default function Search() {
             ) : cars.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-xl shadow-sm">
                 <GiCarKey className="mx-auto text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500 text-xl">
+                <p className="text-gray-500 text-xl mb-4">
                   Aucun véhicule trouvé pour la marque <strong>"{marque}"</strong>
+                  {Object.keys(filters).length > 0 && " avec les filtres sélectionnés"}
                 </p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Essayez avec une autre marque ou modifiez vos filtres.
-                </p>
+                <div className="max-w-md mx-auto">
+                  <p className="text-sm text-gray-400 mb-4">
+                    Suggestions :
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-2 text-left inline-block">
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      Essayez de modifier vos critères de recherche
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      Vérifiez l'orthographe de la marque
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      Réduisez le nombre de filtres appliqués
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      Consultez d'autres marques similaires
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  onClick={() => {
+                    setFilters({});
+                    setSearchTerm(marque);
+                    getCars();
+                  }}
+                  className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                  </svg>
+                  Réinitialiser les filtres
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
