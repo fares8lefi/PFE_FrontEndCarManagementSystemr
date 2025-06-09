@@ -180,7 +180,7 @@ function Navbar() {
           data-aos="fade-right"
         >
           <img
-            src="/logo.png"
+            src="../../public/logoPfe.png"
             alt="Logo AutoMarket"
             className="h-10 w-10 object-contain"
           />

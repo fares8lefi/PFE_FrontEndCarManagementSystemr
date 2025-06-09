@@ -4,11 +4,11 @@ import { MdSpeed, MdDateRange, MdOutlineElectricalServices } from "react-icons/m
 import { FaEuroSign, FaFilter, FaUndo } from "react-icons/fa";
 
 const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
-  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [maxPrice, setMaxPrice] = useState(1000000);
   const [yearRange, setYearRange] = useState([1970, new Date().getFullYear()]);
   const [kmRange, setKmRange] = useState([0, 300000]);
-  const [selectedEnergie, setSelectedEnergie] = useState("");
-  const [selectedBoite, setSelectedBoite] = useState("");
+  const [selectedEnergie, setSelectedEnergie] = useState("Diesel");
+  const [selectedBoite, setSelectedBoite] = useState("Manuelle");
   const [puissanceRange, setPuissanceRange] = useState([0, 500]);
   const [isOpen, setIsOpen] = useState(true);
 
@@ -18,27 +18,28 @@ const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
   const handleApplyFilters = () => {
     const filters = {
       marque: searchedMarque ? searchedMarque.toString() : "",
-      minPrice: Number(priceRange[0]),
-      maxPrice: Number(priceRange[1]),
+      maxPrice: Number(maxPrice),
       minYear: Number(yearRange[0]),
       maxYear: Number(yearRange[1]),
       minKm: Number(kmRange[0]),
       maxKm: Number(kmRange[1]),
-      Energie: selectedEnergie ? selectedEnergie.toString() : "",
-      Boite: selectedBoite ? selectedBoite.toString() : "",
+      Energie: selectedEnergie || "Diesel",
+      Boite: selectedBoite || "Manuelle",
       minPuissance: Number(puissanceRange[0]),
       maxPuissance: Number(puissanceRange[1])
     };
+
+    console.log('Filtres appliqués:', filters);
     onFilterChange(filters);
   };
 
   const handleReset = () => {
-    setPriceRange([0, 1000000]);
+    setMaxPrice(1000000);
     setYearRange([1970, new Date().getFullYear()]);
     setKmRange([0, 300000]);
     setPuissanceRange([0, 500]);
-    setSelectedEnergie("");
-    setSelectedBoite("");
+    setSelectedEnergie("Diesel");
+    setSelectedBoite("Manuelle");
     onFilterChange({});
   };
 
@@ -50,7 +51,8 @@ const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
     min, 
     max, 
     step, 
-    unit 
+    unit,
+    isSingleValue = false
   }) => (
     <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
       <div className="flex items-center gap-2 mb-4">
@@ -60,36 +62,65 @@ const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
       <div className="px-2">
         <div className="relative mb-4">
           <div className="h-2 bg-gray-200 rounded">
-            <div
-              className="absolute h-2 bg-blue-500 rounded"
-              style={{
-                left: `${((value[0] - min) / (max - min)) * 100}%`,
-                right: `${100 - ((value[1] - min) / (max - min)) * 100}%`
-              }}
-            />
+            {isSingleValue ? (
+              <div
+                className="absolute h-2 bg-blue-500 rounded"
+                style={{
+                  width: `${((value - min) / (max - min)) * 100}%`
+                }}
+              />
+            ) : (
+              <div
+                className="absolute h-2 bg-blue-500 rounded"
+                style={{
+                  left: `${((value[0] - min) / (max - min)) * 100}%`,
+                  right: `${100 - ((value[1] - min) / (max - min)) * 100}%`
+                }}
+              />
+            )}
           </div>
-          <input
-            type="range"
-            min={min}
-            max={max}
-            value={value[0]}
-            step={step}
-            onChange={(e) => onChange([Number(e.target.value), value[1]])}
-            className="absolute w-full h-2 opacity-0 cursor-pointer"
-          />
-          <input
-            type="range"
-            min={min}
-            max={max}
-            value={value[1]}
-            step={step}
-            onChange={(e) => onChange([value[0], Number(e.target.value)])}
-            className="absolute w-full h-2 opacity-0 cursor-pointer"
-          />
+          {isSingleValue ? (
+            <input
+              type="range"
+              min={min}
+              max={max}
+              value={value}
+              step={step}
+              onChange={(e) => onChange(Number(e.target.value))}
+              className="absolute w-full h-2 opacity-0 cursor-pointer"
+            />
+          ) : (
+            <>
+              <input
+                type="range"
+                min={min}
+                max={max}
+                value={value[0]}
+                step={step}
+                onChange={(e) => onChange([Number(e.target.value), value[1]])}
+                className="absolute w-full h-2 opacity-0 cursor-pointer"
+              />
+              <input
+                type="range"
+                min={min}
+                max={max}
+                value={value[1]}
+                step={step}
+                onChange={(e) => onChange([value[0], Number(e.target.value)])}
+                className="absolute w-full h-2 opacity-0 cursor-pointer"
+              />
+            </>
+          )}
         </div>
         <div className="flex justify-between text-sm text-gray-600">
-          <span>{value[0].toLocaleString()}{unit}</span>
-          <span>{value[1].toLocaleString()}{unit}</span>
+          {isSingleValue ? (
+            <span>{value.toLocaleString()}{unit}</span>
+          ) : (
+            <>
+              <span>{value[0].toLocaleString()}{unit}</span>
+              <span>{value[1].toLocaleString()}{unit}</span>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -115,14 +146,15 @@ const FilterSidebar = ({ onFilterChange, searchedMarque }) => {
 
         <div className="p-4 space-y-4">
           {renderRangeSlider({
-            label: "Prix",
+            label: "Prix maximum",
             icon: FaEuroSign,
-            value: priceRange,
-            onChange: setPriceRange,
+            value: maxPrice,
+            onChange: setMaxPrice,
             min: 0,
             max: 1000000,
             step: 5000,
-            unit: " TND"
+            unit: " TND",
+            isSingleValue: true
           })}
 
           {renderRangeSlider({

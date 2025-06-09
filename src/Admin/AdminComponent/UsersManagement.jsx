@@ -150,20 +150,6 @@ const UsersManagement = () => {
               />
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
             </div>
-            <button
-              onClick={handleCreateClick}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <FaUserPlus className="mr-2" />
-              Créer un compte
-            </button>
-            <button
-              onClick={() => navigate('/addAdmin')}
-              className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              <FaUserShield className="mr-2" />
-              Ajouter un admin
-            </button>
           </div>
         </div>
 

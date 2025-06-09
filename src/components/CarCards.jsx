@@ -11,8 +11,8 @@ import { MdOutlineElectricalServices, MdDateRange } from 'react-icons/md';
 import { TbManualGearbox } from 'react-icons/tb';
 import { FaPhone } from 'react-icons/fa';
 import { blurCarPlate } from "../services/ApiAI";
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CarCards() {
   const [cars, setCars] = useState([]);
@@ -61,6 +61,13 @@ export default function CarCards() {
     // Empêcher la propagation pour éviter de naviguer vers le détail
     if (e) e.stopPropagation();
 
+    // Vérifier si l'utilisateur est connecté
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      toast.info(' Merci Veuillez vous connecter pour ajouter aux favoris');
+      return;
+    }
+
     // Éviter plusieurs clics
     if (processing[carId]) return;
     
@@ -68,7 +75,7 @@ export default function CarCards() {
     
     try {
       const response = await addCarToFavorites(carId);
-      toast.success("Véhicule ajouté aux favoris !");
+      toast.success(" Véhicule ajouté aux favoris !");
     } catch (error) {
       toast.error(error.response?.data?.message || "Erreur lors de l'ajout aux favoris");
     } finally {
