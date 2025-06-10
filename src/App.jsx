@@ -28,11 +28,11 @@ import UsersManagement from './Admin/AdminComponent/UsersManagement.jsx'
 import CarManagement  from './Admin/AdminComponent/CarManagement.jsx'
 import MessagesMangement from './Admin/AdminComponent/MessagesMangement.jsx'
 import NavbarAdmin from './Admin/AdminComponent/navbarAdmin.jsx'
-import AddADmin from './Admin/AdminComponent/addAdmin.jsx'
 import ForgotPassword from "./layouts/ForgotPassword";
 import NotificationsCards from './components/notificationsCards.jsx'
 import ProfilAdmin from './Admin/AdminComponent/profilAdmin.jsx'
 import AllCars from './Admin/AdminComponent/AllCars';
+import AddCar from './components/addCar.jsx';
 
 function App() {
   return (
@@ -50,6 +50,7 @@ function App() {
       }}
     >
       <Routes>
+        <Route path="/addCar" element={<AddCar />} />
         <Route path="/profilAdmin" element={<ProfilAdmin />} />
         <Route path="/homeAdmin" element={<HomeAdmin />} />
         <Route path="/navbarAdmin" element={<NavbarAdmin />} />
@@ -58,7 +59,6 @@ function App() {
         <Route path="/sideBarAdmin" element={<SideBarAdmin />} />
         <Route path="/usersManagement" element={<UsersManagement />} />
         <Route path="/carManagement" element={<CarManagement />} />    
-        <Route path="/addAdmin" element={<AddADmin />} />
         <Route path="/Navbar" element={<Navbar />} />
         <Route path="/Footer" element={<Footer />} />
         <Route path="/login" element={<Login />} />

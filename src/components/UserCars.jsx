@@ -15,6 +15,8 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { getCarQRCode } from "../services/ApiQrCode";
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { detectCarInImage, blurCarPlate } from "../services/ApiAI";
 
 export default function UserCars() {
   const [cars, setCars] = useState([]);
@@ -40,11 +42,13 @@ export default function UserCars() {
         setCars(res.data.cars);
       } else {
         setCars([]);
-        console.warn('No cars data received from API');
+        toast.warning('Aucune voiture trouvée');
       }
     } catch (error) {
       console.error('Error fetching cars:', error);
-      setError('Failed to load cars. Please try again later.');
+      const errorMessage = error.response?.data?.message || 'Erreur lors du chargement des voitures';
+      setError(errorMessage);
+      toast.error(errorMessage);
       setCars([]);
     } finally {
       setLoading(false);
@@ -53,6 +57,13 @@ export default function UserCars() {
 
   // Ouvrir modal d'édition
   const openEdit = (car) => {
+    // Convertir cars_images en tableau si ce n'est pas déjà le cas
+    const images = Array.isArray(car.cars_images) 
+      ? car.cars_images 
+      : car.cars_images 
+        ? [car.cars_images] 
+        : [];
+
     setEditModal({
       isOpen: true,
       car,
@@ -64,19 +75,100 @@ export default function UserCars() {
         Energie: car.Energie,
         Boite: car.Boite,
         km: car.km,
+        cars_images: images
       },
+      newImages: []
     });
   };
 
-  
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    setEditModal(prev => ({
+      ...prev,
+      newImages: [...prev.newImages, ...files]
+    }));
+  };
+
+  const removeImage = (index) => {
+    setEditModal(prev => ({
+      ...prev,
+      newImages: prev.newImages.filter((_, i) => i !== index)
+    }));
+  };
+
+  const removeExistingImage = (index) => {
+    setEditModal(prev => ({
+      ...prev,
+      formData: {
+        ...prev.formData,
+        cars_images: prev.formData.cars_images.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
   const submitModification = async (e) => {
     e.preventDefault();
     try {
-      await UpdateCarById(editModal.car._id, editModal.formData);
-      getCars();
-      setEditModal({ isOpen: false, car: null });
+      // Vérifier les nouvelles images avec l'IA
+      if (editModal.newImages && editModal.newImages.length > 0) {
+        toast.info('Vérification des images...');
+        
+        for (const image of editModal.newImages) {
+          // Vérifier si l'image contient une voiture
+          const detectionResult = await detectCarInImage(image);
+          if (!detectionResult.hasCar) {
+            toast.error('Une ou plusieurs images ne contiennent pas de voiture valide');
+            return;
+          }
+          
+          
+          const blurredImage = await blurCarPlate(image);
+         
+          const index = editModal.newImages.indexOf(image);
+          editModal.newImages[index] = new File([blurredImage], image.name, { type: image.type });
+        }
+      }
+
+      const formData = new FormData();
+      
+      
+      Object.keys(editModal.formData).forEach(key => {
+        if (key !== 'cars_images') {
+          formData.append(key, editModal.formData[key]);
+        }
+      });
+
+      if (editModal.formData.cars_images && editModal.formData.cars_images.length > 0) {
+        formData.append('existingImages', JSON.stringify(editModal.formData.cars_images));
+      }
+
+      
+      if (editModal.newImages && editModal.newImages.length > 0) {
+        editModal.newImages.forEach((image, index) => {
+          formData.append('newImages', image);
+        });
+      }
+
+      // Log pour débogage
+      console.log('Données envoyées au backend:', {
+        basicData: Object.fromEntries(formData.entries()),
+        existingImages: editModal.formData.cars_images,
+        newImages: editModal.newImages
+      });
+
+      const response = await UpdateCarById(editModal.car._id, formData);
+      
+      if (response.data.success) {
+        toast.success('Véhicule modifié avec succès');
+        await getCars(); // Rafraîchir la liste après modification
+        setEditModal({ isOpen: false, car: null });
+      } else {
+        throw new Error(response.data.message || 'Erreur lors de la modification du véhicule');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Erreur lors de la modification:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Erreur lors de la modification du véhicule';
+      toast.error(errorMessage);
     }
   };
 
@@ -94,10 +186,17 @@ export default function UserCars() {
   const handleAddCarAnnounecement = () => navigate("/addCarAnnounecement");
   const handleDeleteCar = async (carId) => {
     try {
-      await deleteCarByID(carId);
-      await getCars(); // Rafraîchit la liste après suppression
+      const response = await deleteCarByID(carId);
+      if (response.data.success) {
+        toast.success('Véhicule supprimé avec succès');
+        await getCars(); // Rafraîchir la liste après suppression
+      } else {
+        throw new Error(response.data.message || 'Erreur lors de la suppression du véhicule');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Erreur lors de la suppression:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Erreur lors de la suppression du véhicule';
+      toast.error(errorMessage);
     }
   };
 
@@ -119,12 +218,17 @@ export default function UserCars() {
   const handleUpdateCarStatus = async (carId, currentStatus) => {
     try {
       setProcessing(prev => ({ ...prev, [carId]: true }));
-      await updateCarStatus(carId, !currentStatus);
-      toast.success(currentStatus ? "Véhicule marqué comme disponible" : "Véhicule marqué comme vendu");
-      await getCars(); // Rafraîchir la liste
+      const response = await updateCarStatus(carId, !currentStatus);
+      if (response.data.success) {
+        toast.success(currentStatus ? "Véhicule marqué comme disponible" : "Véhicule marqué comme vendu");
+        await getCars(); // Rafraîchir la liste
+      } else {
+        throw new Error(response.data.message || 'Erreur lors de la mise à jour du statut');
+      }
     } catch (error) {
       console.error('Error updating car status:', error);
-      toast.error("Erreur lors de la mise à jour du statut");
+      const errorMessage = error.response?.data?.message || error.message || "Erreur lors de la mise à jour du statut";
+      toast.error(errorMessage);
     } finally {
       setProcessing(prev => ({ ...prev, [carId]: false }));
     }
@@ -180,33 +284,111 @@ export default function UserCars() {
       {/*formulaire de modification */}
       {editModal.isOpen && (
         <div
-          className="fixed inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
           onClick={() => setEditModal({ isOpen: false, car: null })}
         >
           <div
-            className="bg-white rounded-lg p-6 w-full max-w-md shadow-2xl"
+            className="bg-white rounded-lg p-6 w-full max-w-2xl shadow-2xl my-8"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">
               Modifier {editModal.car?.marque}
             </h2>
             <form onSubmit={submitModification}>
-              <div className="space-y-4">
-                {Object.entries(editModal.formData).map(([key, value]) => (
-                  <div key={key}>
-                    <label className="block text-sm font-medium capitalize mb-1 text-gray-700">
-                      {key}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Informations de base */}
+                <div className="space-y-4">
+                  {Object.entries(editModal.formData).map(([key, value]) => {
+                    if (key !== 'cars_images') {
+                      return (
+                        <div key={key}>
+                          <label className="block text-sm font-medium capitalize mb-1 text-gray-700">
+                            {key}
+                          </label>
+                          <input
+                            type={typeof value === "number" ? "number" : "text"}
+                            name={key}
+                            value={value}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+
+                {/* Gestion des images */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700">
+                      Images actuelles
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Array.isArray(editModal.formData.cars_images) && editModal.formData.cars_images.map((image, index) => {
+                        // Vérifier si l'image est une chaîne de caractères (URL) ou un objet avec data
+                        const imageUrl = typeof image === 'string' 
+                          ? image 
+                          : image.data 
+                            ? `data:${image.contentType};base64,${image.data}`
+                            : null;
+
+                        if (!imageUrl) return null;
+
+                        return (
+                          <div key={index} className="relative group">
+                            <img
+                              src={imageUrl}
+                              alt={`Image ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeExistingImage(index)}
+                              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Delete fontSize="small" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700">
+                      Ajouter de nouvelles images
                     </label>
                     <input
-                      type={typeof value === "number" ? "number" : "text"}
-                      name={key}
-                      value={value}
-                      onChange={handleChange}
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {editModal.newImages?.map((image, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={URL.createObjectURL(image)}
+                            alt={`Nouvelle image ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Delete fontSize="small" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
+
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"

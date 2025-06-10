@@ -23,6 +23,8 @@ import {
 } from '../../services/ApiCar';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Enregistrement des composants Chart.js
 ChartJS.register(
@@ -116,6 +118,7 @@ const DashboardAdmin = () => {
   const [dailyCarAdditions, setDailyCarAdditions] = useState([]);
   const [priceStats, setPriceStats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const chartOptions = {
     responsive: true,
@@ -129,38 +132,50 @@ const DashboardAdmin = () => {
   const tableHeaderStyle = 'px-4 py-3 bg-blue-50 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider';
   const tableCellStyle = 'px-4 py-3 text-sm text-gray-700';
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [
-          statsData,
-          latestCarsData,
-          monthlyStatsData,
-          viewsData,
-          dailyCarAdditionsData,
-          priceStatsData,
-        ] = await Promise.all([
-          getCarStats(),
-          getLatestCars(),
-          getMonthlySalesStats(),
-          getDailyViewsStats(),
-          getDailyCarAdditions(),
-          getPriceStatsByBrand(),
-        ]);
+  const fetchDashboardData = async () => {
+    try {
+      setError(null);
+      
+      const [
+        statsData,
+        latestCarsData,
+        monthlyStatsData,
+        viewsData,
+        dailyCarAdditionsData,
+        priceStatsData,
+      ] = await Promise.all([
+        getCarStats(),
+        getLatestCars(),
+        getMonthlySalesStats(),
+        getDailyViewsStats(),
+        getDailyCarAdditions(),
+        getPriceStatsByBrand(),
+      ]);
 
-        setStats(statsData.data || {});
-        setLatestCars(Array.isArray(latestCarsData.data) ? latestCarsData.data : []);
-        setMonthlyStats(Array.isArray(monthlyStatsData.data) ? monthlyStatsData.data : []);
-        setDailyViews(Array.isArray(viewsData.data) ? viewsData.data : []);
-        setDailyCarAdditions(Array.isArray(dailyCarAdditionsData.data) ? dailyCarAdditionsData.data : []);
-        setPriceStats(Array.isArray(priceStatsData.data) ? priceStatsData.data : []);
-      } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
-      } finally {
-        setLoading(false);
+      // Vérifier si les données sont valides
+      if (!statsData?.data || !latestCarsData?.data) {
+        throw new Error('Données invalides reçues du serveur');
       }
-    };
 
+      setStats(statsData.data || {});
+      setLatestCars(Array.isArray(latestCarsData.data) ? latestCarsData.data : []);
+      setMonthlyStats(Array.isArray(monthlyStatsData.data) ? monthlyStatsData.data : []);
+      setDailyViews(Array.isArray(viewsData.data) ? viewsData.data : []);
+      setDailyCarAdditions(Array.isArray(dailyCarAdditionsData.data) ? dailyCarAdditionsData.data : []);
+      setPriceStats(Array.isArray(priceStatsData.data) ? priceStatsData.data : []);
+      
+      console.log('dailyViews after fetch:', viewsData.data);
+      console.log('dailyCarAdditions after fetch:', dailyCarAdditionsData.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error);
+      setError(error.message || 'Erreur lors du chargement des données');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Chargement initial des données
+  useEffect(() => {
     fetchDashboardData();
   }, []);
 
@@ -199,6 +214,13 @@ const DashboardAdmin = () => {
     }],
   };
 
+  // Calculer le total des vues à partir de dailyViews
+  const totalDailyViews = dailyViews.reduce((sum, view) => sum + view.count, 0);
+
+  // Calculer le nombre de voitures ajoutées aujourd'hui
+  const todayFormatted = formatDate(new Date());
+  const carsAddedToday = dailyCarAdditions.find(d => formatDate(d._id.date) === todayFormatted)?.count || 0;
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -210,10 +232,27 @@ const DashboardAdmin = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={fetchDashboardData}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Bouton PDF en haut à droite */}
-      <div className="flex justify-end max-w-7xl mx-auto mt-10">
+      
+      {/* En-tête avec boutons de contrôle */}
+      <div className="flex justify-end max-w-7xl mx-auto mt-10 px-4">
         <button
           onClick={handleDownloadPDF}
           className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition flex items-center gap-2"
@@ -222,7 +261,7 @@ const DashboardAdmin = () => {
         </button>
       </div>
 
-      {/* Contenu du dashboard à capturer */}
+      {/* Contenu du dashboard */}
       <div id="dashboard-content" className="mr-4 max-w-7xl mx-auto mt-10 space-y-8">
         {/* Section des cartes de statistiques */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -232,8 +271,8 @@ const DashboardAdmin = () => {
             format={value => value.toLocaleString()}
           />
           <StatCard
-            title="Vues Totales"
-            value={stats?.viewsStats?.[0]?.totalViews || 0}
+            title="Voitures ajoutées aujourd'hui"
+            value={carsAddedToday}
             format={value => value.toLocaleString()}
           />
           <StatCard
@@ -261,6 +300,14 @@ const DashboardAdmin = () => {
                   plugins: {
                     ...chartOptions.plugins,
                     title: { text: 'Ajouts quotidiens', display: true },
+                  },
+                  scales: {
+                    y: {
+                      min: 0,
+                      ticks: {
+                        stepSize: 1,
+                      },
+                    },
                   },
                 }}
               />

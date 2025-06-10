@@ -13,13 +13,15 @@ const Sidebar = ({ activeMenu, setActiveMenu, onBroadcastClick }) => (
   <aside className="fixed h-full bg-white shadow-lg w-64 z-50">
     <div className="p-6">
       <nav className="space-y-2">
-        {[{
-          key: 'allCars',
-          label: 'Home'
-        }, {
+        {[ {
           key: 'dashboard',
           label: 'Tableau de bord'
-        }, {
+        }, 
+        {
+          key: 'allCars',
+          label: 'Home'
+        },
+        {
           key: 'CarMangement',
           label: 'Gestion des voitures'
         }, {
@@ -96,8 +98,8 @@ const AdminLayout = () => {
         
         <div className="flex-1 ml-64">
           <main className="p-6 max-w-7xl mx-auto">
-            {activeMenu === 'allCars' && <AllCars />}
             {activeMenu === 'dashboard' && <DashboardAdmin />}
+            {activeMenu === 'allCars' && <AllCars />}
             {activeMenu === 'CarMangement' && <CarMangement />}
             {activeMenu === 'UsersManagement' && <UsersManagement />}
             {activeMenu === 'MessagesMangement' && <MessagesMangement/> }

@@ -31,8 +31,15 @@ export const deleteCarByID = (carId) => {
 };
 
 export const UpdateCarById = (carId, updatedData) => {
+  // Vérifier si updatedData est une instance de FormData
+  const isFormData = updatedData instanceof FormData;
+  
   return axios.put(`${apiurl}/UpdateCarById/${carId}`, updatedData, {
     withCredentials: true,
+    headers: {
+      // Si c'est FormData, ne pas définir Content-Type pour laisser axios le faire automatiquement
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' })
+    }
   });
 };
 
@@ -94,11 +101,11 @@ export const getPriceStatsByBrand = () => {
 };
 
 export const getDailyViewsStats = () => {
-  return axiosInstance.get(`${apiurl}/getDailyViewsStats`);
+  return axiosInstance.get(`${apiurl}/getDailyViewsStats?timestamp=${new Date().getTime()}`);
 };
 
 export const getDailyCarAdditions = () => {
-  return axiosInstance.get(`${apiurl}/getDailyCarAdditions`);
+  return axiosInstance.get(`${apiurl}/getDailyCarAdditions?timestamp=${new Date().getTime()}`);
 };
 
 export const updateCarStatus = (carId, isSold) => {

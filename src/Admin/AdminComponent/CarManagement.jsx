@@ -64,7 +64,20 @@ const CarManagement = () => {
     setEditModal({
       isOpen: true,
       car,
-      formData: { ...car },
+      formData: {
+        marque: car.marque || '',
+        model: car.model || '',
+        year: car.year || '',
+        price: car.price || '',
+        phone: car.phone || '',
+        km: car.km || '',
+        Energie: car.Energie || '',
+        Boite: car.Boite || '',
+        Position: car.Position || '',
+        description: car.description || '',
+        Puissance: car.Puissance || '',
+        statut: car.statut || '',
+      },
     });
   };
 
@@ -79,12 +92,23 @@ const CarManagement = () => {
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
     try {
-      await UpdateCarById(editModal.car._id, editModal.formData);
+      const formData = new FormData();
+      
+      // Ajouter uniquement les données de base (non-images) et les champs spécifiés
+      const allowedFields = ['marque', 'model', 'year', 'price', 'phone', 'km', 'Energie', 'Boite', 'Position', 'description', 'Puissance', 'statut'];
+      Object.keys(editModal.formData).forEach(key => {
+        if (allowedFields.includes(key)) {
+          formData.append(key, editModal.formData[key]);
+        }
+      });
+
+      await UpdateCarById(editModal.car._id, formData);
       toast.success("Voiture mise à jour avec succès");
       getCars();
       setEditModal({ isOpen: false, car: null, formData: {} });
     } catch (error) {
-      toast.error(error.message || "Erreur lors de la mise à jour");
+      console.error('Erreur lors de la mise à jour:', error);
+      toast.error(error.response?.data?.message || error.message || "Erreur lors de la mise à jour");
     }
   };
 
@@ -138,7 +162,7 @@ const CarManagement = () => {
 
           {/* Bouton "Créer un compte" */}
           <button
-            onClick={() => navigate("/admin/create-user")}
+            onClick={() => navigate("/addCar")}
             className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-blue-700 transition-colors"
           >
             <FaCarSide />
@@ -229,6 +253,62 @@ const CarManagement = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editModal.isOpen && (
+        <div
+          className="fixed inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+          onClick={() => setEditModal({ isOpen: false, car: null, formData: {} })}
+        >
+          <div
+            className="bg-white rounded-lg p-6 w-full max-w-2xl shadow-2xl my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4">
+              Modifier {editModal.car?.marque} {editModal.car?.model}
+            </h2>
+            <form onSubmit={handleSubmitEdit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Informations de base */}
+                {Object.entries(editModal.formData).map(([key, value]) => {
+                  const allowedFields = ['marque', 'model', 'year', 'price', 'phone', 'km', 'Energie', 'Boite', 'Position', 'description', 'Puissance', 'statut'];
+                  if (!allowedFields.includes(key)) return null; // Exclure les champs non autorisés de l'affichage
+                  return (
+                    <div key={key}>
+                      <label className="block text-sm font-medium capitalize mb-1 text-gray-700">
+                        {key}
+                      </label>
+                      <input
+                        type={typeof value === "number" ? "number" : "text"}
+                        name={key}
+                        value={value}
+                        onChange={handleFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEditModal({ isOpen: false, car: null, formData: {} })}
+                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                >
+                  Modifier
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
