@@ -189,7 +189,7 @@ export default function UserCars() {
       const response = await deleteCarByID(carId);
       if (response.data.success) {
         toast.success('Véhicule supprimé avec succès');
-        await getCars(); // Rafraîchir la liste après suppression
+        await getCars(); 
       } else {
         throw new Error(response.data.message || 'Erreur lors de la suppression du véhicule');
       }
@@ -220,8 +220,8 @@ export default function UserCars() {
       setProcessing(prev => ({ ...prev, [carId]: true }));
       const response = await updateCarStatus(carId, !currentStatus);
       if (response.data.success) {
-        toast.success(currentStatus ? "Véhicule marqué comme disponible" : "Véhicule marqué comme vendu");
-        await getCars(); // Rafraîchir la liste
+         toast.success(currentStatus ? "Véhicule marqué comme disponible" : "Véhicule marqué comme vendu");
+        await getCars(); 
       } else {
         throw new Error(response.data.message || 'Erreur lors de la mise à jour du statut');
       }
